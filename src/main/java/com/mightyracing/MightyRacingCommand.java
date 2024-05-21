@@ -88,7 +88,7 @@ public class MightyRacingCommand {
                                 )
                         )
                 )
-                .then(CommandManager.literal("sistem").requires(source -> source.hasPermissionLevel(2))
+                .then(CommandManager.literal("system").requires(source -> source.hasPermissionLevel(2))
                         .then(CommandManager.literal("status")
                                 .then(CommandManager.argument("targets", EntityArgumentType.players())
                                         .then(CommandManager.literal("driver")
@@ -452,7 +452,7 @@ public class MightyRacingCommand {
                 trackBestLoad(track, name);
                 raceboardPutSort(scoreboard, name, CWHITE);
             }
-            MightyRacingMod.LOGGER.info("Player " + name + " was added to the racing sistem!");
+            MightyRacingMod.LOGGER.info("Player " + name + " was added to the racing system!");
             player.sendMessage(Text.literal("Your status switched to " + DRIVERNAME));
             calls+=1;
         }
@@ -468,7 +468,7 @@ public class MightyRacingCommand {
             Scoreboard scoreboard = source.getServer().getScoreboard();
             raceboardRemoveSort(scoreboard, name);
             MightyPlayer.list.remove(name);
-            MightyRacingMod.LOGGER.info("Player " + name + " was removed from the racing sistem!");
+            MightyRacingMod.LOGGER.info("Player " + name + " was removed from the racing system!");
             player.sendMessage(Text.literal("Your status switched to " + NORMALNAME));
             calls+=1;
         }

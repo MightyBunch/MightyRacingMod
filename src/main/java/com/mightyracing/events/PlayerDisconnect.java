@@ -14,6 +14,6 @@ public class PlayerDisconnect implements ServerPlayConnectionEvents.Disconnect{
         String name = handler.player.getEntityName();
         MightyRacingCommand.raceboardRemoveSort(server.getScoreboard(),name);
         MightyPlayer.list.remove(name);
-        MightyRacingMod.LOGGER.info("Player " + name + " was removed from the racing sistem!");
+        MightyRacingMod.LOGGER.info("Player " + name + " was removed from the racing system!");
     }
 }
