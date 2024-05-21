@@ -1,0 +1,34 @@
+{
+	"schemaVersion": 1,
+	"id": "mighty-racing",
+	"version": "${version}",
+	"name": "Mighty Racing Mod",
+	"description": "Mod that can help you to setup a boat racetrack in minecraft!",
+	"authors": [
+		"Me!"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/mighty-racing/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.mightyracing.MightyRacingMod"
+		]
+	},
+	"mixins": [
+		"mighty-racing.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.15.9",
+		"minecraft": "~1.20.1",
+		"java": ">=17",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}
