@@ -164,8 +164,8 @@ public class MightyRacingCommand {
             }
             Duration delta;
             MightyTime mightydelta;
+            mightyplayer.sector = number;
             if (start != null) {
-                mightyplayer.sector = number;
                 delta = Duration.between(start, now);
                 mightydelta = new MightyTime(delta);
                 mightyplayer.currenttimes.put(number, mightydelta);
@@ -205,8 +205,8 @@ public class MightyRacingCommand {
             }
             boolean fast = false;
             MightyTime mightydelta = null;
+            mightyplayer.sector = 0;
             if (start != null) {
-                mightyplayer.sector = 0;
                 Duration delta;
                 delta = Duration.between(start, now);
                 mightydelta = new MightyTime(delta);
