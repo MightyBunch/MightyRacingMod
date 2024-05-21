@@ -265,27 +265,22 @@ public class MightyRacingCommand {
                             if (start != null) {
                                 if (fast) {
                                     bestSet(name,mightyplayer.currenttimes);
-                                    if (fastest != null) {
+                                    if (fastest != null && fastest != mightyplayer) {
                                         if (MightyTime.compare(mightyplayer.besttimes.get(0), fastest.besttimes.get(0))) {
-                                            if (fastest != mightyplayer) {
-                                                raceboardPutOnlyNamecolor(scoreboard, fastest.player.getEntityName(), CWHITE);
-                                                fastest = mightyplayer;
-                                            }
+                                            raceboardPutOnlyNamecolor(scoreboard, fastest.player.getEntityName(), CWHITE);
+                                            fastest = mightyplayer;
                                             broadcastToDrivers(Text.literal("New fastest lap: " + mightyplayer.cuttedname + " " + CPURPLE + CBOLD + mightyplayer.besttimes.get(0).getString()));
-                                            raceboardPutSort(scoreboard, name, CPURPLE);
                                         } else {
                                             player.sendMessage(Text.literal("Your new best time is: " + CGREEN + CBOLD + mightydelta.getString()));
-                                            raceboardPutSort(scoreboard, name, CWHITE);
                                         }
                                     }else{
                                         broadcastToDrivers(Text.literal("New fastest lap: " + mightyplayer.cuttedname + " " + CPURPLE + CBOLD + mightyplayer.besttimes.get(0).getString()));
-                                        raceboardPutSort(scoreboard, name, CPURPLE);
                                         fastest = mightyplayer;
                                     }
                                 } else {
                                     player.sendMessage(Text.literal("Your time is: " + CRED + CBOLD + mightydelta.getString()));
-                                    raceboardPutSort(scoreboard, name, (fastest == mightyplayer) ? CPURPLE : CWHITE);
                                 }
+                                raceboardPutSort(scoreboard, name, (fastest == mightyplayer) ? CPURPLE : CWHITE);
                                 if (mightyplayer.lap >= racelaps){
                                     racestage = RENDING;
                                     raceboardDisplay(scoreboard,RACINGNAME + CGRAY + "  " + racelaps + "/" + racelaps);
@@ -313,27 +308,22 @@ public class MightyRacingCommand {
                             if (start != null) {
                                 if (fast) {
                                     bestSet(name,mightyplayer.currenttimes);
-                                    if (fastest != null) {
+                                    if (fastest != null && fastest != mightyplayer) {
                                         if (MightyTime.compare(mightyplayer.besttimes.get(0), fastest.besttimes.get(0))) {
-                                            if (fastest != mightyplayer) {
-                                                raceboardPutOnlyNamecolor(scoreboard, fastest.player.getEntityName(), (fastest.namecolor.equals(CDPURPLE)) ? CLGRAY : CWHITE);
-                                                fastest = mightyplayer;
-                                            }
+                                            raceboardPutOnlyNamecolor(scoreboard, fastest.player.getEntityName(), (fastest.namecolor.equals(CDPURPLE)) ? CLGRAY : CWHITE);
+                                            fastest = mightyplayer;
                                             broadcastToDrivers(Text.literal("New fastest lap: " + mightyplayer.cuttedname + " " + CPURPLE + CBOLD + mightyplayer.besttimes.get(0).getString()));
-                                            raceboardPutSort(scoreboard, name, CDPURPLE);
                                         } else {
                                             player.sendMessage(Text.literal("Your new best time is: " + CGREEN + CBOLD + mightydelta.getString()));
-                                            raceboardPutSort(scoreboard, name, CLGRAY);
                                         }
                                     }else{
                                         broadcastToDrivers(Text.literal("New fastest lap: " + mightyplayer.cuttedname + " " + CPURPLE + CBOLD + mightyplayer.besttimes.get(0).getString()));
-                                        raceboardPutSort(scoreboard, name, CDPURPLE);
                                         fastest = mightyplayer;
                                     }
                                 } else {
                                     player.sendMessage(Text.literal("Your time is: " + CRED + CBOLD + mightydelta.getString()));
-                                    raceboardPutSort(scoreboard, name, (fastest == mightyplayer) ? CDPURPLE : CLGRAY);
                                 }
+                                raceboardPutSort(scoreboard, name, (fastest == mightyplayer) ? CDPURPLE : CLGRAY);
                                 player.sendMessage(Text.literal("You finished the race!"));
                                 mightyplayer.starttime = null;
                                 checkRaceEnd();
