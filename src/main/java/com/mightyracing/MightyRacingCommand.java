@@ -7,6 +7,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.scoreboard.Scoreboard;
+import net.minecraft.scoreboard.ScoreboardDisplaySlot;
 import net.minecraft.scoreboard.ScoreboardObjective;
 import net.minecraft.scoreboard.ScoreboardPlayerScore;
 import net.minecraft.server.command.CommandManager;
@@ -725,12 +726,12 @@ public class MightyRacingCommand {
         ScoreboardObjective raceboard = scoreboard.getNullableObjective("MRM_raceboard");
         if (raceboard != null) {
             raceboard.setDisplayName(Text.literal(name));
-            scoreboard.setObjectiveSlot(1, raceboard);
+            scoreboard.setObjectiveSlot(ScoreboardDisplaySlot.SIDEBAR, raceboard);
             raceboarddisplayname = name;
         }
     }
     private static void raceboardNotDisplay(Scoreboard scoreboard){
-        scoreboard.setObjectiveSlot(1, null);
+        scoreboard.setObjectiveSlot(ScoreboardDisplaySlot.SIDEBAR, null);
     }
     private static void bestReset() {
         for (MightyPlayer mightyplayer : MightyPlayer.list.values()) {
