@@ -6,9 +6,9 @@ MightyRacingMod is a Minecraft mod designed to enhance your boat racing experien
 
 ## Features
 
-- **New Commands**: Adds a variety of commands to help set up Practice, Qualification and Grand Prix.
-- **Command Blocks**: Utilizes command blocks to setup race track - with them you can create sectors, finish line and pitstop.
-- **Scoreboard Integration**: Displays race statistics and raceboards in real-time using the scoreboard, keeping players informed of their position and lap times.
+- **Raceboard**: Uses the scoreboard to display driver standings, their on-track position and their fastest lap in real-time! (see it the 'Preview')
+- **Lap Time Display**: Displays the current lap time and the intervals from their best lap above the inventory. (see it the 'Preview')
+- **Commands**: Adds a variety of commands to help set up Practice, Qualification and Grand Prix. Mod utilizes command blocks to setup race track - with them you can create sectors, finish line and even the pitlane. All commands for this mod start with /mightyracing.
 - **Fully server-side**: Doesn't requires installation on the client-side, as it doesn't use any custom interfaces or new blocks but utilizes command blocks and scoreboard.
 
 ## Usage
@@ -17,11 +17,21 @@ MightyRacingMod is a Minecraft mod designed to enhance your boat racing experien
 
 ## Preview
 
+Raceboard displaying laptimes during Free Practice:
+
 ![image](https://github.com/MightyBunch/MightyRacingMod/assets/117296149/efeebd72-191a-4067-bb1c-9e012f46f497)
+
+Raceboard displaying on-track position during Grand Prix:
+
+![image](https://github.com/MightyBunch/MightyRacingMod/assets/117296149/317046f3-ef93-4d62-9a3d-ab6af5d6d055)
+
+Lap time display:
 
 ![image](https://github.com/MightyBunch/MightyRacingMod/assets/117296149/e1fce948-4a07-410e-a6a3-9ada32431a10)
 
-![image](https://github.com/MightyBunch/MightyRacingMod/assets/117296149/317046f3-ef93-4d62-9a3d-ab6af5d6d055)
+Video preview:
+
+https://youtu.be/u1smHAEm5BM
 
 ## Please Note
 
@@ -34,7 +44,3 @@ Thank you for your support and understanding!
 ## License
 
 This project is licensed under the Apache License - see the [LICENSE](LICENSE) file for details.
-
-##
-
-Enjoy your boat racing with MightyRacingMod!
