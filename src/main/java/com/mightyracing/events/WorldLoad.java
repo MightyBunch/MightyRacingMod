@@ -5,6 +5,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.scoreboard.ScoreboardCriterion;
 import net.minecraft.scoreboard.ScoreboardObjective;
+import net.minecraft.scoreboard.number.NumberFormat;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.text.Text;
 
@@ -18,7 +19,7 @@ public class WorldLoad implements ServerLifecycleEvents.ServerStarted{
             if (raceboard != null) {
                 scoreboard.removeObjective(raceboard);
             }
-            scoreboard.addObjective("MRM_raceboard", ScoreboardCriterion.DUMMY, Text.literal("MRM_raceboard"), ScoreboardCriterion.RenderType.INTEGER);
+            scoreboard.addObjective("MRM_raceboard", ScoreboardCriterion.DUMMY, Text.literal("MRM_raceboard"),ScoreboardCriterion.RenderType.INTEGER,false, (NumberFormat)null);
         }
     }
 }
