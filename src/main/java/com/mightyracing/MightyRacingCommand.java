@@ -67,22 +67,22 @@ public class MightyRacingCommand {
                 .then(CommandManager.literal("track").requires(source -> source.hasPermissionLevel(2))
                         .then(CommandManager.argument("targets", EntityArgumentType.players())
                                 .then(CommandManager.literal("sector")
-                                        .then(CommandManager.argument("number", IntegerArgumentType.integer(1, 9))
+                                        .then(CommandManager.argument("number", IntegerArgumentType.integer(1, 100))
                                                 .executes(context -> sector(context.getSource(), EntityArgumentType.getPlayers(context, "targets"), IntegerArgumentType.getInteger(context, "number")))
                                         )
                                 )
                                 .then(CommandManager.literal("lap")
-                                        .then(CommandManager.argument("number", IntegerArgumentType.integer(1, 9))
+                                        .then(CommandManager.argument("number", IntegerArgumentType.integer(1, 100))
                                                 .executes(context -> lap(context.getSource(), EntityArgumentType.getPlayers(context, "targets"), IntegerArgumentType.getInteger(context, "number")))
                                         )
                                 )
                                 .then(CommandManager.literal("pitentry")
-                                        .then(CommandManager.argument("number", IntegerArgumentType.integer(1, 9))
+                                        .then(CommandManager.argument("number", IntegerArgumentType.integer(1, 100))
                                                 .executes(context -> pitentry(context.getSource(), EntityArgumentType.getPlayers(context, "targets"), IntegerArgumentType.getInteger(context, "number")))
                                         )
                                 )
                                 .then(CommandManager.literal("pitexit")
-                                        .then(CommandManager.argument("number", IntegerArgumentType.integer(1, 9))
+                                        .then(CommandManager.argument("number", IntegerArgumentType.integer(1, 100))
                                                 .executes(context -> pitexit(context.getSource(), EntityArgumentType.getPlayers(context, "targets"), IntegerArgumentType.getInteger(context, "number")))
                                         )
                                 )
@@ -723,9 +723,11 @@ public class MightyRacingCommand {
     }
     public static void raceboardDisplay(Scoreboard scoreboard, String name){
         ScoreboardObjective raceboard = scoreboard.getNullableObjective("MRM_raceboard");
-        raceboard.setDisplayName(Text.literal(name));
-        scoreboard.setObjectiveSlot(1, raceboard);
-        raceboarddisplayname = name;
+        if (raceboard != null) {
+            raceboard.setDisplayName(Text.literal(name));
+            scoreboard.setObjectiveSlot(1, raceboard);
+            raceboarddisplayname = name;
+        }
     }
     private static void raceboardNotDisplay(Scoreboard scoreboard){
         scoreboard.setObjectiveSlot(1, null);
