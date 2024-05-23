@@ -585,7 +585,7 @@ public class MightyRacingCommand {
     }
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     private static void clearRaceboard(Scoreboard scoreboard){
-        ScoreboardObjective raceboard = scoreboard.getObjective("MRM_raceboard");
+        ScoreboardObjective raceboard = scoreboard.getNullableObjective("MRM_raceboard");
         for (Map.Entry<String, MightyPlayer> listentry : MightyPlayer.list.entrySet()){
             MightyPlayer mightyplayer = listentry.getValue();
             if (mightyplayer.raceboardname == null){
@@ -596,7 +596,7 @@ public class MightyRacingCommand {
         }
     }
     public static void raceboardPutOnlyNamecolor(Scoreboard scoreboard, String name, String namecolor) {
-        ScoreboardObjective raceboard = scoreboard.getObjective("MRM_raceboard");
+        ScoreboardObjective raceboard = scoreboard.getNullableObjective("MRM_raceboard");
         MightyPlayer mightyplayer = MightyPlayer.list.get(name);
         if (mightyplayer.raceboardname == null){
             return;
@@ -617,7 +617,7 @@ public class MightyRacingCommand {
         raceboardentry.setScore(scr);
     }
     public static void raceboardPutSort(Scoreboard scoreboard, String name, String namecolor){
-        ScoreboardObjective raceboard = scoreboard.getObjective("MRM_raceboard");
+        ScoreboardObjective raceboard = scoreboard.getNullableObjective("MRM_raceboard");
         MightyPlayer mightyplayer1 = MightyPlayer.list.get(name);
         mightyplayer1.namecolor = namecolor;
         int completed1 = mightyplayer1.lap * 10 + mightyplayer1.sector;
@@ -687,7 +687,7 @@ public class MightyRacingCommand {
         raceboardentry.setScore(scr);
     }
     public static void raceboardRemoveSort(Scoreboard scoreboard, String name){
-        ScoreboardObjective raceboard = scoreboard.getObjective("MRM_raceboard");
+        ScoreboardObjective raceboard = scoreboard.getNullableObjective("MRM_raceboard");
         MightyPlayer mightyplayer1 = MightyPlayer.list.get(name);
         if (mightyplayer1.raceboardname == null) {
             return;
@@ -722,7 +722,7 @@ public class MightyRacingCommand {
         mightyplayer1.raceboardname = null;
     }
     public static void raceboardDisplay(Scoreboard scoreboard, String name){
-        ScoreboardObjective raceboard = scoreboard.getObjective("MRM_raceboard");
+        ScoreboardObjective raceboard = scoreboard.getNullableObjective("MRM_raceboard");
         raceboard.setDisplayName(Text.literal(name));
         scoreboard.setObjectiveSlot(1, raceboard);
         raceboarddisplayname = name;
