@@ -414,7 +414,7 @@ public class MightyRacingCommand {
                     Collection<ServerPlayerEntity> target1 = new ArrayList<>(){};
                     target1.add(player);
                     lap(source,target1,number);
-                    if (mightyplayer.lap != -1 || racingstatus == RDURING){
+                    if (mightyplayer.lap > 0 || mightyplayer.lap < racelaps){
                         mightyplayer.stops += 1;
                     }
                 }
