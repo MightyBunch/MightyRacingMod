@@ -164,8 +164,8 @@ public class MightyRacingCommand {
             }
             Duration delta;
             MightyTime mightydelta;
-            mightyplayer.sector = number;
             if (start != null) {
+                mightyplayer.sector = number;
                 delta = Duration.between(start, now);
                 mightydelta = new MightyTime(delta);
                 mightyplayer.currenttimes.put(number, mightydelta);
@@ -191,12 +191,10 @@ public class MightyRacingCommand {
                 continue;
             }
             MightyPlayer mightyplayer = MightyPlayer.list.get(name);
-            if (mightyplayer.sector < number) {
-                if (racingstatus != RACING || mightyplayer.lap != -1){
-                    continue;
-                }
-            }
             LocalDateTime start = mightyplayer.starttime;
+            if (mightyplayer.sector < number && start != null) {
+                continue;
+            }
             if (now == null) {
                 now = LocalDateTime.now();
             }
@@ -349,38 +347,45 @@ public class MightyRacingCommand {
                 continue;
             }
             MightyPlayer mightyplayer = MightyPlayer.list.get(name);
-            if (mightyplayer.sector >= number) {
-                continue;
-            }
             if (scoreboard == null) {
                 scoreboard = source.getServer().getScoreboard();
             }
             switch (racingstatus) {
                 case PRACTICE -> {
-                    mightyplayer.sector = number;
+                    if (mightyplayer.sector == 0) {
+                        continue;
+                    }
+                    mightyplayer.sector = 0;
                     mightyplayer.starttime = null;
                     mightyplayer.interval = CRED + "+0:00:00";
                 }
                 case QUALI -> {
+                    if (mightyplayer.sector == 0) {
+                        continue;
+                    }
                     switch (qualistage){
                         case QDURING -> {
-                            mightyplayer.sector = number;
+                            mightyplayer.sector = 0;
                             mightyplayer.starttime = null;
                             mightyplayer.interval = CRED + "+0:00:00";
                         }
                         case QENDING -> {
-                            mightyplayer.sector = number;
+                            mightyplayer.sector = 0;
                             mightyplayer.starttime = null;
                             mightyplayer.interval = CRED + "+0:00:00";
                             checkQualiEnd();
                             raceboardPutOnlyNamecolor(scoreboard, name, CLGRAY);
                         }
                         case QENDED -> {
+                            mightyplayer.sector = 0;
                             mightyplayer.interval = CRED + "+0:00:00";
                         }
                     }
                 }
                 case RACING -> {
+                    if (mightyplayer.sector >= number) {
+                        continue;
+                    }
                     Collection<ServerPlayerEntity> target1 = new ArrayList<>(){};
                     target1.add(player);
                     sector(source, target1, number);
@@ -411,13 +416,13 @@ public class MightyRacingCommand {
             }
             switch (racingstatus) {
                 case PRACTICE, QUALI -> {
-                    mightyplayer.sector = 0;
+                    //
                 }
                 case RACING -> {
                     Collection<ServerPlayerEntity> target1 = new ArrayList<>(){};
                     target1.add(player);
                     lap(source,target1,number);
-                    if (racingstatus == RDURING){
+                    if (mightyplayer.lap > 0 || mightyplayer.lap < racelaps){
                         mightyplayer.stops += 1;
                     }
                 }
