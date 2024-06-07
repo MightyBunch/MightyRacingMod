@@ -406,14 +406,6 @@ public class MightyRacingCommand {
                 continue;
             }
             MightyPlayer mightyplayer = MightyPlayer.list.get(name);
-            if (mightyplayer.sector < number) {
-                if (racingstatus == RACING && mightyplayer.lap == -1){
-                    Collection<ServerPlayerEntity> target1 = new ArrayList<>(){};
-                    target1.add(player);
-                    lap(source,target1,number);
-                }
-                continue;
-            }
             switch (racingstatus) {
                 case PRACTICE, QUALI -> {
                     //
