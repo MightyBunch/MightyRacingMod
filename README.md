@@ -1,8 +1,8 @@
-# MightyRacingMod
+# MightyRacing
 
 ## Overview
 
-MightyRacingMod is a Minecraft mod designed to enhance your boat racing experience. It introduces new commands and uses command blocks to manage race tracks. With MightyRacingMod, you can easily set up and manage boat races, while the scoreboard feature keeps track of all the important race statistics, displaying a comprehensive raceboard for all drivers.
+MightyRacing is a Minecraft mod designed to enhance your boat racing experience. It introduces new commands and uses command blocks to manage race tracks. With MightyRacing, you can easily set up and manage boat races, while the scoreboard feature keeps track of all the important race statistics, displaying a comprehensive raceboard for all drivers.
 
 ## Features
 
@@ -44,3 +44,8 @@ Thank you for your support and understanding!
 ## License
 
 This project is licensed under the Apache License - see the [LICENSE](LICENSE) file for details.
+
+## Misc.
+
+[MODRINTH](https://modrinth.com/mod/mightyracing)
+[CURSEFORGE](https://www.curseforge.com/minecraft/mc-mods/mightyracing)
