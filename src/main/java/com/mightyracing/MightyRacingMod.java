@@ -1,11 +1,13 @@
 package com.mightyracing;
 
+import com.mightyracing.events.MightyDataCopy;
 import com.mightyracing.events.MightyTick;
 import com.mightyracing.events.PlayerDisconnect;
 import com.mightyracing.events.WorldLoad;
 import net.fabricmc.api.ModInitializer;
 
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
@@ -26,6 +28,7 @@ public class MightyRacingMod implements ModInitializer {
 		ServerPlayConnectionEvents.DISCONNECT.register(new PlayerDisconnect());
 		ServerLifecycleEvents.SERVER_STARTED.register(new WorldLoad());
 		ServerTickEvents.END_SERVER_TICK.register(new MightyTick());
+		ServerPlayerEvents.COPY_FROM.register(new MightyDataCopy());
 
 		LOGGER.info("MightyRacingMod initialized!");
 	}
