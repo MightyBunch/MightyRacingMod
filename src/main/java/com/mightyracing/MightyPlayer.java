@@ -34,7 +34,7 @@ public class MightyPlayer {
       this.cuttedname = null;
       this.namecolor = "§f";
       this.stops = 0;
-      MightyPlayer.list.put(player.getEntityName(),this);
+      MightyPlayer.list.put(player.getGameProfile().getName(),this);
    }
    public static void allToZero(){
       for(MightyPlayer mightyplayer : MightyPlayer.list.values()) {

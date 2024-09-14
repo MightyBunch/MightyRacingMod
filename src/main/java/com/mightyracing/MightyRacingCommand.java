@@ -7,7 +7,6 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.scoreboard.Scoreboard;
-import net.minecraft.scoreboard.ScoreboardDisplaySlot;
 import net.minecraft.scoreboard.ScoreboardObjective;
 import net.minecraft.scoreboard.ScoreboardPlayerScore;
 import net.minecraft.server.command.CommandManager;
@@ -151,7 +150,7 @@ public class MightyRacingCommand {
         int calls = 0;
         LocalDateTime now = null;
         for (ServerPlayerEntity player : targets) {
-            String name = player.getEntityName();
+            String name = player.getGameProfile().getName();
             if (!MightyPlayer.list.containsKey(name) || racingstatus == OFFLINE) {
                 continue;
             }
@@ -187,7 +186,7 @@ public class MightyRacingCommand {
         LocalDateTime now = null;
         Scoreboard scoreboard = null;
         for (ServerPlayerEntity player : targets) {
-            String name = player.getEntityName();
+            String name = player.getGameProfile().getName();
             if (!MightyPlayer.list.containsKey(name)) {
                 continue;
             }
@@ -266,7 +265,7 @@ public class MightyRacingCommand {
                                     bestSet(name,mightyplayer.currenttimes);
                                     if (fastest != null && fastest != mightyplayer) {
                                         if (MightyTime.compare(mightyplayer.besttimes.get(0), fastest.besttimes.get(0))) {
-                                            raceboardPutOnlyNamecolor(scoreboard, fastest.player.getEntityName(), CWHITE);
+                                            raceboardPutOnlyNamecolor(scoreboard, fastest.player.getGameProfile().getName(), CWHITE);
                                             fastest = mightyplayer;
                                             broadcastToDrivers(Text.literal("New fastest lap: " + mightyplayer.cuttedname + " " + CPURPLE + CBOLD + mightyplayer.besttimes.get(0).getString()));
                                         } else {
@@ -309,7 +308,7 @@ public class MightyRacingCommand {
                                     bestSet(name,mightyplayer.currenttimes);
                                     if (fastest != null && fastest != mightyplayer) {
                                         if (MightyTime.compare(mightyplayer.besttimes.get(0), fastest.besttimes.get(0))) {
-                                            raceboardPutOnlyNamecolor(scoreboard, fastest.player.getEntityName(), (fastest.namecolor.equals(CDPURPLE)) ? CLGRAY : CWHITE);
+                                            raceboardPutOnlyNamecolor(scoreboard, fastest.player.getGameProfile().getName(), (fastest.namecolor.equals(CDPURPLE)) ? CLGRAY : CWHITE);
                                             fastest = mightyplayer;
                                             broadcastToDrivers(Text.literal("New fastest lap: " + mightyplayer.cuttedname + " " + CPURPLE + CBOLD + mightyplayer.besttimes.get(0).getString()));
                                         } else {
@@ -343,7 +342,7 @@ public class MightyRacingCommand {
         int calls = 0;
         Scoreboard scoreboard = null;
         for (ServerPlayerEntity player : targets) {
-            String name = player.getEntityName();
+            String name = player.getGameProfile().getName();
             if (!MightyPlayer.list.containsKey(name)) {
                 continue;
             }
@@ -402,7 +401,7 @@ public class MightyRacingCommand {
         }
         int calls = 0;
         for (ServerPlayerEntity player : targets) {
-            String name = player.getEntityName();
+            String name = player.getGameProfile().getName();
             if (!MightyPlayer.list.containsKey(name)) {
                 continue;
             }
@@ -427,7 +426,7 @@ public class MightyRacingCommand {
     private static int driver(ServerCommandSource source, Collection<ServerPlayerEntity> targets){
         int calls = 0;
         for (ServerPlayerEntity player : targets) {
-            String name = player.getEntityName();
+            String name = player.getGameProfile().getName();
             if (MightyPlayer.list.containsKey(name)) {
                 continue;
             }
@@ -459,7 +458,7 @@ public class MightyRacingCommand {
     private static int normal(ServerCommandSource source, Collection<ServerPlayerEntity> targets){
         int calls = 0;
         for (ServerPlayerEntity player : targets) {
-            String name = player.getEntityName();
+            String name = player.getGameProfile().getName();
             if (!MightyPlayer.list.containsKey(name)) {
                 continue;
             }
@@ -542,7 +541,7 @@ public class MightyRacingCommand {
     private static int timereset(ServerCommandSource source, Collection<ServerPlayerEntity> targets ,String trackname) {
         int calls = 0;
         for (ServerPlayerEntity player : targets) {
-            String name = player.getEntityName();
+            String name = player.getGameProfile().getName();
             if (!MightyPlayer.list.containsKey(name)) {
                 continue;
             }
@@ -569,7 +568,7 @@ public class MightyRacingCommand {
             source.sendMessage(Text.literal("Your raceboard name has to contain 3 symbols"));
             return 0;
         }
-        String name = Objects.requireNonNull(source.getPlayer()).getEntityName();
+        String name = Objects.requireNonNull(source.getPlayer()).getGameProfile().getName();
         if (!MightyPlayer.list.containsKey(name)) {
             source.sendMessage(Text.literal("You must be " + DRIVERNAME + CWHITE + " to change your raceboard name"));
             return 0;
@@ -589,7 +588,7 @@ public class MightyRacingCommand {
             if (mightyplayer.raceboardname == null){
                 continue;
             }
-            scoreboard.resetPlayerScore(mightyplayer.raceboardname,raceboard);
+            MightyScoreBoard.raceboardResetPlayer(mightyplayer.raceboardname,scoreboard);
             mightyplayer.raceboardname = null;
         }
     }
@@ -599,10 +598,8 @@ public class MightyRacingCommand {
         if (mightyplayer.raceboardname == null){
             return;
         }
-        int scr = 0;
-        ScoreboardPlayerScore raceboardentry = scoreboard.getPlayerScore(mightyplayer.raceboardname, raceboard);
-        scr = raceboardentry.getScore();
-        scoreboard.resetPlayerScore(mightyplayer.raceboardname, raceboard);
+        int scr = MightyScoreBoard.raceboardGetPlayer(mightyplayer.raceboardname,scoreboard);
+        MightyScoreBoard.raceboardResetPlayer(mightyplayer.raceboardname,scoreboard);
         mightyplayer.namecolor = namecolor;
         int len = MightyPlayer.list.size();
         int number = (scr - len) * -1;
@@ -611,8 +608,7 @@ public class MightyRacingCommand {
         }else {
             mightyplayer.raceboardname = raceboardFormatter(number, mightyplayer.namecolor, mightyplayer.cuttedname, mightyplayer.besttimes.get(0).getString());
         }
-        raceboardentry = scoreboard.getPlayerScore(mightyplayer.raceboardname,raceboard);
-        raceboardentry.setScore(scr);
+        MightyScoreBoard.raceboardSetPlayer(mightyplayer.raceboardname,scoreboard,scr);
     }
     public static void raceboardPutSort(Scoreboard scoreboard, String name, String namecolor){
         ScoreboardObjective raceboard = scoreboard.getNullableObjective("MRM_raceboard");
@@ -632,10 +628,8 @@ public class MightyRacingCommand {
                 continue;
             }
             if (mightyplayer1.raceboardname != null){
-                ScoreboardPlayerScore raceboardentry1 = scoreboard.getPlayerScore(mightyplayer1.raceboardname,raceboard);
-                int score1 = raceboardentry1.getScore();
-                ScoreboardPlayerScore raceboardentry2 = scoreboard.getPlayerScore(mightyplayer2.raceboardname,raceboard);
-                int score2 = raceboardentry2.getScore();
+                int score1 = MightyScoreBoard.raceboardGetPlayer(mightyplayer1.raceboardname,scoreboard);
+                int score2 = MightyScoreBoard.raceboardGetPlayer(mightyplayer2.raceboardname,scoreboard);
                 if (score1 > score2){
                     scr += 1;
                     continue;
@@ -650,30 +644,27 @@ public class MightyRacingCommand {
             }
             if (result){
                 scr += 1;
-                ScoreboardPlayerScore raceboardentry = scoreboard.getPlayerScore(mightyplayer2.raceboardname, raceboard);
-                int score = raceboardentry.getScore();
+                int score = MightyScoreBoard.raceboardGetPlayer(mightyplayer2.raceboardname,scoreboard);
                 if (mightyplayer1.raceboardname != null) {
                     score -= 1;
                 }
-                scoreboard.resetPlayerScore(mightyplayer2.raceboardname, raceboard);
+                MightyScoreBoard.raceboardResetPlayer(mightyplayer2.raceboardname,scoreboard);
                 int number = (score - len) * -1;
                 if (racingstatus == RACING){
                     mightyplayer2.raceboardname = raceboardFormatter(number, mightyplayer2.namecolor, mightyplayer2.cuttedname, (mightyplayer2.lap == -1 ? 0 : mightyplayer2.lap) + "l " + mightyplayer2.sector + "s");
                 }else {
                     mightyplayer2.raceboardname = raceboardFormatter(number, mightyplayer2.namecolor, mightyplayer2.cuttedname, mightyplayer2.besttimes.get(0).getString());
                 }
-                raceboardentry = scoreboard.getPlayerScore(mightyplayer2.raceboardname, raceboard);
-                raceboardentry.setScore(score);
+                MightyScoreBoard.raceboardSetPlayer(mightyplayer2.raceboardname,scoreboard,score);
             }else{
                 if (mightyplayer1.raceboardname == null) {
-                    ScoreboardPlayerScore raceboardentry = scoreboard.getPlayerScore(mightyplayer2.raceboardname, raceboard);
-                    int score = raceboardentry.getScore();
-                    raceboardentry.setScore(score + 1);
+                    int score = MightyScoreBoard.raceboardGetPlayer(mightyplayer2.raceboardname,scoreboard);
+                    MightyScoreBoard.raceboardSetPlayer(mightyplayer2.raceboardname,scoreboard,score+1);
                 }
             }
         }
         if (mightyplayer1.raceboardname != null) {
-            scoreboard.resetPlayerScore(mightyplayer1.raceboardname, raceboard);
+            MightyScoreBoard.raceboardResetPlayer(mightyplayer1.raceboardname,scoreboard);
         }
         int number = (scr - len) * -1;
         if (racingstatus == RACING){
@@ -681,8 +672,7 @@ public class MightyRacingCommand {
         }else {
             mightyplayer1.raceboardname = raceboardFormatter(number, mightyplayer1.namecolor, mightyplayer1.cuttedname, mightyplayer1.besttimes.get(0).getString());
         }
-        ScoreboardPlayerScore raceboardentry = scoreboard.getPlayerScore(mightyplayer1.raceboardname,raceboard);
-        raceboardentry.setScore(scr);
+        MightyScoreBoard.raceboardSetPlayer(mightyplayer1.raceboardname,scoreboard,scr);
     }
     public static void raceboardRemoveSort(Scoreboard scoreboard, String name){
         ScoreboardObjective raceboard = scoreboard.getNullableObjective("MRM_raceboard");
@@ -696,39 +686,36 @@ public class MightyRacingCommand {
                 continue;
             }
             if (mightyplayer2.raceboardname != null){
-                ScoreboardPlayerScore raceboardentry1 = scoreboard.getPlayerScore(mightyplayer1.raceboardname,raceboard);
-                int score1 = raceboardentry1.getScore();
-                ScoreboardPlayerScore raceboardentry2 = scoreboard.getPlayerScore(mightyplayer2.raceboardname,raceboard);
-                int score2 = raceboardentry2.getScore();
+                int score1 = MightyScoreBoard.raceboardGetPlayer(mightyplayer1.raceboardname,scoreboard);
+                int score2 = MightyScoreBoard.raceboardGetPlayer(mightyplayer2.raceboardname,scoreboard);
                 if (score1 > score2){
-                    scoreboard.resetPlayerScore(mightyplayer2.raceboardname, raceboard);
+                    MightyScoreBoard.raceboardResetPlayer(mightyplayer2.raceboardname,scoreboard);
                     int number = (score2 - len + 1) * -1;
                     if (racingstatus == RACING){
                         mightyplayer2.raceboardname = raceboardFormatter(number, mightyplayer2.namecolor, mightyplayer2.cuttedname, (mightyplayer2.lap == -1 ? 0 : mightyplayer2.lap) + "l " + mightyplayer2.sector + "s");
                     }else{
                         mightyplayer2.raceboardname = raceboardFormatter(number, mightyplayer2.namecolor, mightyplayer2.cuttedname, mightyplayer2.besttimes.get(0).getString());
                     }
-                    raceboardentry2 = scoreboard.getPlayerScore(mightyplayer2.raceboardname, raceboard);
-                    raceboardentry2.setScore(score2);
+                    MightyScoreBoard.raceboardSetPlayer(mightyplayer2.raceboardname,scoreboard,score2);
                 }else{
-                    raceboardentry2.setScore(score2 - 1);
+                    MightyScoreBoard.raceboardSetPlayer(mightyplayer2.raceboardname,scoreboard,score2-1);
                 }
 
             }
         }
-        scoreboard.resetPlayerScore(mightyplayer1.raceboardname,raceboard);
+        MightyScoreBoard.raceboardResetPlayer(mightyplayer1.raceboardname,scoreboard);
         mightyplayer1.raceboardname = null;
     }
     public static void raceboardDisplay(Scoreboard scoreboard, String name){
         ScoreboardObjective raceboard = scoreboard.getNullableObjective("MRM_raceboard");
         if (raceboard != null) {
             raceboard.setDisplayName(Text.literal(name));
-            scoreboard.setObjectiveSlot(ScoreboardDisplaySlot.SIDEBAR, raceboard);
+            MightyScoreBoard.setRaceboardSidebar(scoreboard);
             raceboarddisplayname = name;
         }
     }
     private static void raceboardNotDisplay(Scoreboard scoreboard){
-        scoreboard.setObjectiveSlot(ScoreboardDisplaySlot.SIDEBAR, null);
+        MightyScoreBoard.resetSlotSidebar(scoreboard);
     }
     private static void bestReset() {
         for (MightyPlayer mightyplayer : MightyPlayer.list.values()) {
