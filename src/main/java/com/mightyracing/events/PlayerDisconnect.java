@@ -11,7 +11,7 @@ public class PlayerDisconnect implements ServerPlayConnectionEvents.Disconnect{
 
     @Override
     public void onPlayDisconnect(ServerPlayNetworkHandler handler, MinecraftServer server) {
-        String name = handler.player.getEntityName();
+        String name = handler.player.getGameProfile().getName();
         if (MightyPlayer.list.containsKey(name)) {
             MightyRacingCommand.raceboardRemoveSort(server.getScoreboard(), name);
             MightyPlayer.list.remove(name);

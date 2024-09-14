@@ -150,7 +150,7 @@ public class MightyRacingCommand {
         int calls = 0;
         LocalDateTime now = null;
         for (ServerPlayerEntity player : targets) {
-            String name = player.getEntityName();
+            String name = player.getGameProfile().getName();
             if (!MightyPlayer.list.containsKey(name) || racingstatus == OFFLINE) {
                 continue;
             }
@@ -186,7 +186,7 @@ public class MightyRacingCommand {
         LocalDateTime now = null;
         Scoreboard scoreboard = null;
         for (ServerPlayerEntity player : targets) {
-            String name = player.getEntityName();
+            String name = player.getGameProfile().getName();
             if (!MightyPlayer.list.containsKey(name)) {
                 continue;
             }
@@ -265,7 +265,7 @@ public class MightyRacingCommand {
                                     bestSet(name,mightyplayer.currenttimes);
                                     if (fastest != null && fastest != mightyplayer) {
                                         if (MightyTime.compare(mightyplayer.besttimes.get(0), fastest.besttimes.get(0))) {
-                                            raceboardPutOnlyNamecolor(scoreboard, fastest.player.getEntityName(), CWHITE);
+                                            raceboardPutOnlyNamecolor(scoreboard, fastest.player.getGameProfile().getName(), CWHITE);
                                             fastest = mightyplayer;
                                             broadcastToDrivers(Text.literal("New fastest lap: " + mightyplayer.cuttedname + " " + CPURPLE + CBOLD + mightyplayer.besttimes.get(0).getString()));
                                         } else {
@@ -308,7 +308,7 @@ public class MightyRacingCommand {
                                     bestSet(name,mightyplayer.currenttimes);
                                     if (fastest != null && fastest != mightyplayer) {
                                         if (MightyTime.compare(mightyplayer.besttimes.get(0), fastest.besttimes.get(0))) {
-                                            raceboardPutOnlyNamecolor(scoreboard, fastest.player.getEntityName(), (fastest.namecolor.equals(CDPURPLE)) ? CLGRAY : CWHITE);
+                                            raceboardPutOnlyNamecolor(scoreboard, fastest.player.getGameProfile().getName(), (fastest.namecolor.equals(CDPURPLE)) ? CLGRAY : CWHITE);
                                             fastest = mightyplayer;
                                             broadcastToDrivers(Text.literal("New fastest lap: " + mightyplayer.cuttedname + " " + CPURPLE + CBOLD + mightyplayer.besttimes.get(0).getString()));
                                         } else {
@@ -342,7 +342,7 @@ public class MightyRacingCommand {
         int calls = 0;
         Scoreboard scoreboard = null;
         for (ServerPlayerEntity player : targets) {
-            String name = player.getEntityName();
+            String name = player.getGameProfile().getName();
             if (!MightyPlayer.list.containsKey(name)) {
                 continue;
             }
@@ -401,7 +401,7 @@ public class MightyRacingCommand {
         }
         int calls = 0;
         for (ServerPlayerEntity player : targets) {
-            String name = player.getEntityName();
+            String name = player.getGameProfile().getName();
             if (!MightyPlayer.list.containsKey(name)) {
                 continue;
             }
@@ -426,7 +426,7 @@ public class MightyRacingCommand {
     private static int driver(ServerCommandSource source, Collection<ServerPlayerEntity> targets){
         int calls = 0;
         for (ServerPlayerEntity player : targets) {
-            String name = player.getEntityName();
+            String name = player.getGameProfile().getName();
             if (MightyPlayer.list.containsKey(name)) {
                 continue;
             }
@@ -458,7 +458,7 @@ public class MightyRacingCommand {
     private static int normal(ServerCommandSource source, Collection<ServerPlayerEntity> targets){
         int calls = 0;
         for (ServerPlayerEntity player : targets) {
-            String name = player.getEntityName();
+            String name = player.getGameProfile().getName();
             if (!MightyPlayer.list.containsKey(name)) {
                 continue;
             }
@@ -541,7 +541,7 @@ public class MightyRacingCommand {
     private static int timereset(ServerCommandSource source, Collection<ServerPlayerEntity> targets ,String trackname) {
         int calls = 0;
         for (ServerPlayerEntity player : targets) {
-            String name = player.getEntityName();
+            String name = player.getGameProfile().getName();
             if (!MightyPlayer.list.containsKey(name)) {
                 continue;
             }
@@ -568,7 +568,7 @@ public class MightyRacingCommand {
             source.sendMessage(Text.literal("Your raceboard name has to contain 3 symbols"));
             return 0;
         }
-        String name = Objects.requireNonNull(source.getPlayer()).getEntityName();
+        String name = Objects.requireNonNull(source.getPlayer()).getGameProfile().getName();
         if (!MightyPlayer.list.containsKey(name)) {
             source.sendMessage(Text.literal("You must be " + DRIVERNAME + CWHITE + " to change your raceboard name"));
             return 0;
