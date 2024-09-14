@@ -8,7 +8,7 @@ import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.scoreboard.ScoreboardObjective;
-import net.minecraft.scoreboard.*;
+import net.minecraft.scoreboard.ScoreboardPlayerScore;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -588,8 +588,7 @@ public class MightyRacingCommand {
             if (mightyplayer.raceboardname == null){
                 continue;
             }
-            ScoreHolder scoreHolder = ScoreHolder.fromName(mightyplayer.raceboardname);
-            scoreboard.removeScore(scoreHolder,raceboard);
+            MightyScoreBoard.raceboardResetPlayer(mightyplayer.raceboardname,scoreboard);
             mightyplayer.raceboardname = null;
         }
     }
@@ -599,11 +598,8 @@ public class MightyRacingCommand {
         if (mightyplayer.raceboardname == null){
             return;
         }
-        int scr = 0;
-        ScoreHolder scoreHolder = ScoreHolder.fromName(mightyplayer.raceboardname);
-        ScoreAccess raceboardentry = scoreboard.getOrCreateScore(scoreHolder,raceboard);
-        scr = raceboardentry.getScore();
-        scoreboard.removeScore(scoreHolder,raceboard);
+        int scr = MightyScoreBoard.raceboardGetPlayer(mightyplayer.raceboardname,scoreboard);
+        MightyScoreBoard.raceboardResetPlayer(mightyplayer.raceboardname,scoreboard);
         mightyplayer.namecolor = namecolor;
         int len = MightyPlayer.list.size();
         int number = (scr - len) * -1;
@@ -612,9 +608,7 @@ public class MightyRacingCommand {
         }else {
             mightyplayer.raceboardname = raceboardFormatter(number, mightyplayer.namecolor, mightyplayer.cuttedname, mightyplayer.besttimes.get(0).getString());
         }
-        scoreHolder = ScoreHolder.fromName(mightyplayer.raceboardname);
-        raceboardentry = scoreboard.getOrCreateScore(scoreHolder,raceboard);
-        raceboardentry.setScore(scr);
+        MightyScoreBoard.raceboardSetPlayer(mightyplayer.raceboardname,scoreboard,scr);
     }
     public static void raceboardPutSort(Scoreboard scoreboard, String name, String namecolor){
         ScoreboardObjective raceboard = scoreboard.getNullableObjective("MRM_raceboard");
@@ -634,12 +628,8 @@ public class MightyRacingCommand {
                 continue;
             }
             if (mightyplayer1.raceboardname != null){
-                ScoreHolder scoreHolder1 = ScoreHolder.fromName(mightyplayer1.raceboardname);
-                ScoreAccess raceboardentry1 = scoreboard.getOrCreateScore(scoreHolder1,raceboard);
-                int score1 = raceboardentry1.getScore();
-                ScoreHolder scoreHolder2 =  ScoreHolder.fromName(mightyplayer2.raceboardname);
-                ScoreAccess raceboardentry2 = scoreboard.getOrCreateScore(scoreHolder2,raceboard);
-                int score2 = raceboardentry2.getScore();
+                int score1 = MightyScoreBoard.raceboardGetPlayer(mightyplayer1.raceboardname,scoreboard);
+                int score2 = MightyScoreBoard.raceboardGetPlayer(mightyplayer2.raceboardname,scoreboard);
                 if (score1 > score2){
                     scr += 1;
                     continue;
@@ -654,34 +644,27 @@ public class MightyRacingCommand {
             }
             if (result){
                 scr += 1;
-                ScoreHolder scoreHolder2 = ScoreHolder.fromName(mightyplayer2.raceboardname);
-                ScoreAccess raceboardentry = scoreboard.getOrCreateScore(scoreHolder2, raceboard);
-                int score = raceboardentry.getScore();
+                int score = MightyScoreBoard.raceboardGetPlayer(mightyplayer2.raceboardname,scoreboard);
                 if (mightyplayer1.raceboardname != null) {
                     score -= 1;
                 }
-                scoreboard.removeScore(scoreHolder2,raceboard);
+                MightyScoreBoard.raceboardResetPlayer(mightyplayer2.raceboardname,scoreboard);
                 int number = (score - len) * -1;
                 if (racingstatus == RACING){
                     mightyplayer2.raceboardname = raceboardFormatter(number, mightyplayer2.namecolor, mightyplayer2.cuttedname, (mightyplayer2.lap == -1 ? 0 : mightyplayer2.lap) + "l " + mightyplayer2.sector + "s");
                 }else {
                     mightyplayer2.raceboardname = raceboardFormatter(number, mightyplayer2.namecolor, mightyplayer2.cuttedname, mightyplayer2.besttimes.get(0).getString());
                 }
-                scoreHolder2 = ScoreHolder.fromName(mightyplayer2.raceboardname);
-                raceboardentry = scoreboard.getOrCreateScore(scoreHolder2, raceboard);
-                raceboardentry.setScore(score);
+                MightyScoreBoard.raceboardSetPlayer(mightyplayer2.raceboardname,scoreboard,score);
             }else{
                 if (mightyplayer1.raceboardname == null) {
-                    ScoreHolder scoreHolder2 = ScoreHolder.fromName(mightyplayer2.raceboardname);
-                    ScoreAccess raceboardentry = scoreboard.getOrCreateScore(scoreHolder2, raceboard);
-                    int score = raceboardentry.getScore();
-                    raceboardentry.setScore(score + 1);
+                    int score = MightyScoreBoard.raceboardGetPlayer(mightyplayer2.raceboardname,scoreboard);
+                    MightyScoreBoard.raceboardSetPlayer(mightyplayer2.raceboardname,scoreboard,score+1);
                 }
             }
         }
         if (mightyplayer1.raceboardname != null) {
-            ScoreHolder scoreHolder1 = ScoreHolder.fromName(mightyplayer1.raceboardname);
-            scoreboard.removeScore(scoreHolder1, raceboard);
+            MightyScoreBoard.raceboardResetPlayer(mightyplayer1.raceboardname,scoreboard);
         }
         int number = (scr - len) * -1;
         if (racingstatus == RACING){
@@ -689,9 +672,7 @@ public class MightyRacingCommand {
         }else {
             mightyplayer1.raceboardname = raceboardFormatter(number, mightyplayer1.namecolor, mightyplayer1.cuttedname, mightyplayer1.besttimes.get(0).getString());
         }
-        ScoreHolder scoreHolder1 = ScoreHolder.fromName(mightyplayer1.raceboardname);
-        ScoreAccess raceboardentry = scoreboard.getOrCreateScore(scoreHolder1,raceboard);
-        raceboardentry.setScore(scr);
+        MightyScoreBoard.raceboardSetPlayer(mightyplayer1.raceboardname,scoreboard,scr);
     }
     public static void raceboardRemoveSort(Scoreboard scoreboard, String name){
         ScoreboardObjective raceboard = scoreboard.getNullableObjective("MRM_raceboard");
@@ -705,43 +686,36 @@ public class MightyRacingCommand {
                 continue;
             }
             if (mightyplayer2.raceboardname != null){
-                ScoreHolder scoreHolder1 = ScoreHolder.fromName(mightyplayer1.raceboardname);
-                ScoreAccess raceboardentry1 = scoreboard.getOrCreateScore(scoreHolder1,raceboard);
-                int score1 = raceboardentry1.getScore();
-                ScoreHolder scoreHolder2 = ScoreHolder.fromName(mightyplayer2.raceboardname);
-                ScoreAccess raceboardentry2 = scoreboard.getOrCreateScore(scoreHolder2,raceboard);
-                int score2 = raceboardentry2.getScore();
+                int score1 = MightyScoreBoard.raceboardGetPlayer(mightyplayer1.raceboardname,scoreboard);
+                int score2 = MightyScoreBoard.raceboardGetPlayer(mightyplayer2.raceboardname,scoreboard);
                 if (score1 > score2){
-                    scoreboard.removeScore(scoreHolder2, raceboard);
+                    MightyScoreBoard.raceboardResetPlayer(mightyplayer2.raceboardname,scoreboard);
                     int number = (score2 - len + 1) * -1;
                     if (racingstatus == RACING){
                         mightyplayer2.raceboardname = raceboardFormatter(number, mightyplayer2.namecolor, mightyplayer2.cuttedname, (mightyplayer2.lap == -1 ? 0 : mightyplayer2.lap) + "l " + mightyplayer2.sector + "s");
                     }else{
                         mightyplayer2.raceboardname = raceboardFormatter(number, mightyplayer2.namecolor, mightyplayer2.cuttedname, mightyplayer2.besttimes.get(0).getString());
                     }
-                    scoreHolder2 = ScoreHolder.fromName(mightyplayer2.raceboardname);
-                    raceboardentry2 = scoreboard.getOrCreateScore(scoreHolder2, raceboard);
-                    raceboardentry2.setScore(score2);
+                    MightyScoreBoard.raceboardSetPlayer(mightyplayer2.raceboardname,scoreboard,score2);
                 }else{
-                    raceboardentry2.setScore(score2 - 1);
+                    MightyScoreBoard.raceboardSetPlayer(mightyplayer2.raceboardname,scoreboard,score2-1);
                 }
 
             }
         }
-        ScoreHolder scoreHolder1 = ScoreHolder.fromName(mightyplayer1.raceboardname);
-        scoreboard.removeScore(scoreHolder1,raceboard);
+        MightyScoreBoard.raceboardResetPlayer(mightyplayer1.raceboardname,scoreboard);
         mightyplayer1.raceboardname = null;
     }
     public static void raceboardDisplay(Scoreboard scoreboard, String name){
         ScoreboardObjective raceboard = scoreboard.getNullableObjective("MRM_raceboard");
         if (raceboard != null) {
             raceboard.setDisplayName(Text.literal(name));
-            scoreboard.setObjectiveSlot(ScoreboardDisplaySlot.SIDEBAR, raceboard);
+            MightyScoreBoard.setRaceboardSidebar(scoreboard);
             raceboarddisplayname = name;
         }
     }
     private static void raceboardNotDisplay(Scoreboard scoreboard){
-        scoreboard.setObjectiveSlot(ScoreboardDisplaySlot.SIDEBAR, null);
+        MightyScoreBoard.resetSlotSidebar(scoreboard);
     }
     private static void bestReset() {
         for (MightyPlayer mightyplayer : MightyPlayer.list.values()) {
