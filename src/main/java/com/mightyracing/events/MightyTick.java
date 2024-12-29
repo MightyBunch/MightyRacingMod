@@ -69,7 +69,7 @@ public class MightyTick implements ServerTickEvents.EndTick{
                 currenttime = "0:00:00";
             }
             String actionbar = currenttime + " " + mightyplayer.interval;
-            mightyplayer.player.sendMessage(Text.literal(actionbar), true);
+            mightyplayer.player.sendMessageToClient(Text.literal(actionbar), true);
         }
     }
 }
