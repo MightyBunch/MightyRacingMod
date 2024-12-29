@@ -50,10 +50,16 @@ public class MightyTime {
    public int getInt(){
       return ((this.m * 10000) + (this.s * 100) + this.ms);
    }
-
+   public int getMs(){
+      return ((this.m * 6000) + (this.s * 100) + this.ms);
+   }
    public static String interval(MightyTime time, MightyTime besttime){
-      int delta = time.getInt() - besttime.getInt();
-      MightyTime mightydelta = new MightyTime(delta);
+      int delta = time.getMs() - besttime.getMs();
+      int lm = delta / 6000;
+      int ls = (delta - lm * 6000) / 100;
+      int lms = (delta - lm * 6000 - ls * 100);
+      int inttime = ((lm * 10000) + (ls * 100) + lms);
+      MightyTime mightydelta = new MightyTime(inttime);
       String charac = delta >= 0 ? "§c+" : "§a-";
       return charac + mightydelta.getString();
    }
