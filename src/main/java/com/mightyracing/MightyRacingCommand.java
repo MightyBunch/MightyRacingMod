@@ -430,10 +430,10 @@ public class MightyRacingCommand {
                 continue;
             }
             if (racingstatus==QUALI){
-                player.sendMessage(Text.literal("You can't change status during " + QUALINAME));
+                player.sendMessageToClient(Text.literal("You can't change status during " + QUALINAME),false);
                 continue;
             }else if (racingstatus==RACING){
-                player.sendMessage(Text.literal("You can't change status during " + RACINGNAME));
+                player.sendMessageToClient(Text.literal("You can't change status during " + RACINGNAME),false);
                 continue;
             }
             MightyPlayer mightyplayer = new MightyPlayer(player);
@@ -449,7 +449,7 @@ public class MightyRacingCommand {
                 raceboardPutSort(scoreboard, name, CWHITE);
             }
             MightyRacingMod.LOGGER.info("Player " + name + " was added to the racing system!");
-            player.sendMessage(Text.literal("Your status switched to " + DRIVERNAME));
+            player.sendMessageToClient(Text.literal("Your status switched to " + DRIVERNAME),false);
             calls+=1;
         }
         return calls;
@@ -465,7 +465,7 @@ public class MightyRacingCommand {
             raceboardRemoveSort(scoreboard, name);
             MightyPlayer.list.remove(name);
             MightyRacingMod.LOGGER.info("Player " + name + " was removed from the racing system!");
-            player.sendMessage(Text.literal("Your status switched to " + NORMALNAME));
+            player.sendMessageToClient(Text.literal("Your status switched to " + NORMALNAME),false);
             calls+=1;
         }
         return calls;
@@ -550,7 +550,7 @@ public class MightyRacingCommand {
                 raceboardRemoveSort(scoreboard, name);
                 raceboardPutSort(scoreboard, name, CWHITE);
             }
-            player.sendMessage(Text.literal("Your time on track " + trackname + " has been reset"));
+            player.sendMessageToClient(Text.literal("Your time on track " + trackname + " has been reset"),false);
             calls+=1;
         }
         return calls;
@@ -560,23 +560,23 @@ public class MightyRacingCommand {
             return 0;
         }
         if (racingstatus != OFFLINE){
-            source.sendMessage(Text.literal("You can change your raceboard name only if race is " + OFFLINENAME));
+            Objects.requireNonNull(source.getPlayer()).sendMessageToClient(Text.literal("You can change your raceboard name only if race is " + OFFLINENAME),false);
             return 0;
         }
         if (cuttedname.length() < 3){
-            source.sendMessage(Text.literal("Your raceboard name has to contain 3 symbols"));
+            Objects.requireNonNull(source.getPlayer()).sendMessageToClient(Text.literal("Your raceboard name has to contain 3 symbols"),false);
             return 0;
         }
         String name = Objects.requireNonNull(source.getPlayer()).getGameProfile().getName();
         if (!MightyPlayer.list.containsKey(name)) {
-            source.sendMessage(Text.literal("You must be " + DRIVERNAME + CWHITE + " to change your raceboard name"));
+            Objects.requireNonNull(source.getPlayer()).sendMessageToClient(Text.literal("You must be " + DRIVERNAME + CWHITE + " to change your raceboard name"),false);
             return 0;
         }
         MightyPlayer mightyplayer = MightyPlayer.list.get(name);
         cuttedname = cutName(cuttedname);
         mightyplayer.cuttedname=cuttedname;
         MightyData.putName(((IEntityDataSaver)source.getPlayer()),cuttedname);
-        source.sendMessage(Text.literal("Your raceboard name has changed to " + cuttedname));
+        Objects.requireNonNull(source.getPlayer()).sendMessageToClient(Text.literal("Your raceboard name has changed to " + cuttedname),false);
         return 1;
     }
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -805,7 +805,7 @@ public class MightyRacingCommand {
     }
     public static void broadcastToDrivers(Text message) {
         for (MightyPlayer mightyplayer : MightyPlayer.list.values()){
-            mightyplayer.player.sendMessage(message);
+            mightyplayer.player.sendMessageToClient(message,false);
         }
     }
     public static void checkQualiEnd(){
