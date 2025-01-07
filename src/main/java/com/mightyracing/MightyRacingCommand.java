@@ -51,6 +51,8 @@ public class MightyRacingCommand {
     public static final String DRIVERNAME = "§lDRIVER";
     public static final String NORMALNAME = "§lNORMAL";
 
+    public static final String NO_TIME = "No time";
+
     public static int qualitime = 0;
     public static String track = null;
     public static int qualistage = 0;
@@ -66,22 +68,22 @@ public class MightyRacingCommand {
                 .then(CommandManager.literal("track").requires(source -> source.hasPermissionLevel(2))
                         .then(CommandManager.argument("targets", EntityArgumentType.players())
                                 .then(CommandManager.literal("sector")
-                                        .then(CommandManager.argument("number", IntegerArgumentType.integer(1, 100))
+                                        .then(CommandManager.argument("number", IntegerArgumentType.integer(1, 99))
                                                 .executes(context -> sector(context.getSource(), EntityArgumentType.getPlayers(context, "targets"), IntegerArgumentType.getInteger(context, "number")))
                                         )
                                 )
                                 .then(CommandManager.literal("lap")
-                                        .then(CommandManager.argument("number", IntegerArgumentType.integer(1, 100))
+                                        .then(CommandManager.argument("number", IntegerArgumentType.integer(1, 99))
                                                 .executes(context -> lap(context.getSource(), EntityArgumentType.getPlayers(context, "targets"), IntegerArgumentType.getInteger(context, "number")))
                                         )
                                 )
                                 .then(CommandManager.literal("pitentry")
-                                        .then(CommandManager.argument("number", IntegerArgumentType.integer(1, 100))
+                                        .then(CommandManager.argument("number", IntegerArgumentType.integer(1, 99))
                                                 .executes(context -> pitentry(context.getSource(), EntityArgumentType.getPlayers(context, "targets"), IntegerArgumentType.getInteger(context, "number")))
                                         )
                                 )
                                 .then(CommandManager.literal("pitexit")
-                                        .then(CommandManager.argument("number", IntegerArgumentType.integer(1, 100))
+                                        .then(CommandManager.argument("number", IntegerArgumentType.integer(1, 99))
                                                 .executes(context -> pitexit(context.getSource(), EntityArgumentType.getPlayers(context, "targets"), IntegerArgumentType.getInteger(context, "number")))
                                         )
                                 )
@@ -113,7 +115,7 @@ public class MightyRacingCommand {
                                         )
                                 )
                                 .then(CommandManager.literal("racing")
-                                        .then(CommandManager.argument("laps", IntegerArgumentType.integer(1, 100))
+                                        .then(CommandManager.argument("laps", IntegerArgumentType.integer(1, 99))
                                                 .executes(context -> racestatus(context.getSource(), RACING,null,0,IntegerArgumentType.getInteger(context, "laps")))
                                         )
                                 )
@@ -167,8 +169,12 @@ public class MightyRacingCommand {
                 mightyplayer.sector = number;
                 delta = Duration.between(start, now);
                 mightydelta = new MightyTime(delta);
-                mightyplayer.currenttimes.put(number, mightydelta);
-                mightyplayer.interval = MightyTime.interval(mightydelta, mightyplayer.besttimes.get(number));
+                int prev=mightyplayer.currenttimes.size();
+                mightyplayer.currenttimes.addAll(Collections.nCopies(number-prev-1,null));
+                mightyplayer.currenttimes.add(number-1, mightydelta);
+                if (mightyplayer.besttimes.size() > number && mightyplayer.besttimes.get(number) != null) {
+                    mightyplayer.interval = MightyTime.interval(mightydelta, mightyplayer.besttimes.get(number));
+                }
                 if (racingstatus == RACING && (racestage == RDURING || racestage == RENDING)){
                     raceboardPutSort(source.getServer().getScoreboard(), name, mightyplayer.namecolor);
                 }
@@ -207,10 +213,13 @@ public class MightyRacingCommand {
                 Duration delta;
                 delta = Duration.between(start, now);
                 mightydelta = new MightyTime(delta);
-                mightyplayer.currenttimes.put(0, mightydelta);
-                MightyTime mightybestdelta = mightyplayer.besttimes.get(0);
-                mightyplayer.interval = MightyTime.interval(mightydelta, mightybestdelta);
-                fast = MightyTime.compare(mightydelta, mightybestdelta);
+                mightyplayer.currenttimes.add(0,mightydelta);
+                if (!mightyplayer.besttimes.isEmpty()) {
+                    mightyplayer.interval = MightyTime.interval(mightydelta, mightyplayer.besttimes.get(0));
+                    fast = MightyTime.compare(mightydelta, mightyplayer.besttimes.get(0));
+                }else {
+                    fast=true;
+                }
             }
             switch (racingstatus) {
                 case PRACTICE -> {
@@ -263,15 +272,15 @@ public class MightyRacingCommand {
                                 if (fast) {
                                     bestSet(name,mightyplayer.currenttimes);
                                     if (fastest != null && fastest != mightyplayer) {
-                                        if (MightyTime.compare(mightyplayer.besttimes.get(0), fastest.besttimes.get(0))) {
+                                        if (MightyTime.compare(mightydelta, fastest.besttimes.get(0))) {
                                             raceboardPutOnlyNamecolor(scoreboard, fastest.player.getGameProfile().getName(), CWHITE);
                                             fastest = mightyplayer;
-                                            broadcastToDrivers(Text.literal("New fastest lap: " + mightyplayer.cuttedname + " " + CPURPLE + CBOLD + mightyplayer.besttimes.get(0).getString()));
+                                            broadcastToDrivers(Text.literal("New fastest lap: " + mightyplayer.cuttedname + " " + CPURPLE + CBOLD + mightydelta.getString()));
                                         } else {
                                             player.sendMessageToClient(Text.literal("Your new best time is: " + CGREEN + CBOLD + mightydelta.getString()),false);
                                         }
                                     }else{
-                                        broadcastToDrivers(Text.literal("New fastest lap: " + mightyplayer.cuttedname + " " + CPURPLE + CBOLD + mightyplayer.besttimes.get(0).getString()));
+                                        broadcastToDrivers(Text.literal("New fastest lap: " + mightyplayer.cuttedname + " " + CPURPLE + CBOLD + mightydelta.getString()));
                                         fastest = mightyplayer;
                                     }
                                 } else {
@@ -306,15 +315,15 @@ public class MightyRacingCommand {
                                 if (fast) {
                                     bestSet(name,mightyplayer.currenttimes);
                                     if (fastest != null && fastest != mightyplayer) {
-                                        if (MightyTime.compare(mightyplayer.besttimes.get(0), fastest.besttimes.get(0))) {
+                                        if (MightyTime.compare(mightydelta, fastest.besttimes.get(0))) {
                                             raceboardPutOnlyNamecolor(scoreboard, fastest.player.getGameProfile().getName(), (fastest.namecolor.equals(CDPURPLE)) ? CLGRAY : CWHITE);
                                             fastest = mightyplayer;
-                                            broadcastToDrivers(Text.literal("New fastest lap: " + mightyplayer.cuttedname + " " + CPURPLE + CBOLD + mightyplayer.besttimes.get(0).getString()));
+                                            broadcastToDrivers(Text.literal("New fastest lap: " + mightyplayer.cuttedname + " " + CPURPLE + CBOLD + mightydelta.getString()));
                                         } else {
                                             player.sendMessageToClient(Text.literal("Your new best time is: " + CGREEN + CBOLD + mightydelta.getString()),false);
                                         }
                                     }else{
-                                        broadcastToDrivers(Text.literal("New fastest lap: " + mightyplayer.cuttedname + " " + CPURPLE + CBOLD + mightyplayer.besttimes.get(0).getString()));
+                                        broadcastToDrivers(Text.literal("New fastest lap: " + mightyplayer.cuttedname + " " + CPURPLE + CBOLD + mightydelta.getString()));
                                         fastest = mightyplayer;
                                     }
                                 } else {
@@ -541,11 +550,9 @@ public class MightyRacingCommand {
         int calls = 0;
         for (ServerPlayerEntity player : targets) {
             String name = player.getGameProfile().getName();
-            if (!MightyPlayer.list.containsKey(name)) {
-                continue;
-            }
-            trackBestReset(trackname, name);
-            if (racingstatus == PRACTICE) {
+            trackBestReset(trackname, player);
+            if (racingstatus == PRACTICE && MightyPlayer.list.containsKey(name)) {
+                MightyPlayer.list.get(name).besttimes.clear();
                 Scoreboard scoreboard = source.getServer().getScoreboard();
                 raceboardRemoveSort(scoreboard, name);
                 raceboardPutSort(scoreboard, name, CWHITE);
@@ -601,16 +608,16 @@ public class MightyRacingCommand {
         int len = MightyPlayer.list.size();
         int number = (scr - len) * -1;
         if (racingstatus == RACING){
-            mightyplayer.raceboardname = raceboardFormatter(number, mightyplayer.namecolor, mightyplayer.cuttedname, (mightyplayer.lap == -1 ? 0 : mightyplayer.lap) + "l " + mightyplayer.sector + "s");
+            mightyplayer.raceboardname = raceboardFormatter(number, mightyplayer.namecolor, mightyplayer.cuttedname, (mightyplayer.lap < 10 ? "0" : "") + (mightyplayer.lap == -1 ? 0 : mightyplayer.lap) + "l " + (mightyplayer.sector < 10 ? "0" : "") + mightyplayer.sector + "s");
         }else {
-            mightyplayer.raceboardname = raceboardFormatter(number, mightyplayer.namecolor, mightyplayer.cuttedname, mightyplayer.besttimes.get(0).getString());
+            mightyplayer.raceboardname = raceboardFormatter(number, mightyplayer.namecolor, mightyplayer.cuttedname, (mightyplayer.besttimes.isEmpty() ? NO_TIME : mightyplayer.besttimes.get(0).getString()));
         }
         MightyScoreBoard.raceboardSetPlayer(mightyplayer.raceboardname,scoreboard,scr);
     }
     public static void raceboardPutSort(Scoreboard scoreboard, String name, String namecolor){
         MightyPlayer mightyplayer1 = MightyPlayer.list.get(name);
         mightyplayer1.namecolor = namecolor;
-        int completed1 = mightyplayer1.lap * 10 + mightyplayer1.sector;
+        int completed1 = mightyplayer1.lap * 100 + mightyplayer1.sector;
         int len = 1;
         int scr = 0;
         for (MightyPlayer mightyplayer2 : MightyPlayer.list.values()){
@@ -633,10 +640,10 @@ public class MightyRacingCommand {
             }
             boolean result;
             if (racingstatus == RACING){
-                int completed2 = mightyplayer2.lap * 10 + mightyplayer2.sector;
+                int completed2 = mightyplayer2.lap * 100 + mightyplayer2.sector;
                 result = (completed1 > completed2);
             }else{
-                result = MightyTime.compare(mightyplayer1.besttimes.get(0),mightyplayer2.besttimes.get(0));
+                result = mightyplayer1.besttimes.isEmpty() || mightyplayer2.besttimes.isEmpty() || MightyTime.compare(mightyplayer1.besttimes.get(0),mightyplayer2.besttimes.get(0));
             }
             if (result){
                 scr += 1;
@@ -647,9 +654,9 @@ public class MightyRacingCommand {
                 MightyScoreBoard.raceboardResetPlayer(mightyplayer2.raceboardname,scoreboard);
                 int number = (score - len) * -1;
                 if (racingstatus == RACING){
-                    mightyplayer2.raceboardname = raceboardFormatter(number, mightyplayer2.namecolor, mightyplayer2.cuttedname, (mightyplayer2.lap == -1 ? 0 : mightyplayer2.lap) + "l " + mightyplayer2.sector + "s");
+                    mightyplayer2.raceboardname = raceboardFormatter(number, mightyplayer2.namecolor, mightyplayer2.cuttedname, (mightyplayer2.lap < 10 ? "0" : "") + (mightyplayer2.lap == -1 ? 0 : mightyplayer2.lap) + "l " + (mightyplayer2.sector < 10 ? "0" : "") + mightyplayer2.sector + "s");
                 }else {
-                    mightyplayer2.raceboardname = raceboardFormatter(number, mightyplayer2.namecolor, mightyplayer2.cuttedname, mightyplayer2.besttimes.get(0).getString());
+                    mightyplayer2.raceboardname = raceboardFormatter(number, mightyplayer2.namecolor, mightyplayer2.cuttedname, (mightyplayer2.besttimes.isEmpty() ? NO_TIME : mightyplayer2.besttimes.get(0).getString()));
                 }
                 MightyScoreBoard.raceboardSetPlayer(mightyplayer2.raceboardname,scoreboard,score);
             }else{
@@ -664,9 +671,9 @@ public class MightyRacingCommand {
         }
         int number = (scr - len) * -1;
         if (racingstatus == RACING){
-            mightyplayer1.raceboardname = raceboardFormatter(number, mightyplayer1.namecolor, mightyplayer1.cuttedname, (mightyplayer1.lap == -1 ? 0 : mightyplayer1.lap) + "l " + mightyplayer1.sector + "s");
+            mightyplayer1.raceboardname = raceboardFormatter(number, mightyplayer1.namecolor, mightyplayer1.cuttedname, (mightyplayer1.lap < 10 ? "0" : "") + (mightyplayer1.lap == -1 ? 0 : mightyplayer1.lap) + "l " + (mightyplayer1.sector < 10 ? "0" : "") + mightyplayer1.sector + "s");
         }else {
-            mightyplayer1.raceboardname = raceboardFormatter(number, mightyplayer1.namecolor, mightyplayer1.cuttedname, mightyplayer1.besttimes.get(0).getString());
+            mightyplayer1.raceboardname = raceboardFormatter(number, mightyplayer1.namecolor, mightyplayer1.cuttedname, (mightyplayer1.besttimes.isEmpty() ? NO_TIME : mightyplayer1.besttimes.get(0).getString()));
         }
         MightyScoreBoard.raceboardSetPlayer(mightyplayer1.raceboardname,scoreboard,scr);
     }
@@ -687,9 +694,9 @@ public class MightyRacingCommand {
                     MightyScoreBoard.raceboardResetPlayer(mightyplayer2.raceboardname,scoreboard);
                     int number = (score2 - len + 1) * -1;
                     if (racingstatus == RACING){
-                        mightyplayer2.raceboardname = raceboardFormatter(number, mightyplayer2.namecolor, mightyplayer2.cuttedname, (mightyplayer2.lap == -1 ? 0 : mightyplayer2.lap) + "l " + mightyplayer2.sector + "s");
+                        mightyplayer2.raceboardname = raceboardFormatter(number, mightyplayer2.namecolor, mightyplayer2.cuttedname, (mightyplayer2.lap < 10 ? "0" : "") + (mightyplayer2.lap == -1 ? 0 : mightyplayer2.lap) + "l " + (mightyplayer2.sector < 10 ? "0" : "") + mightyplayer2.sector + "s");
                     }else{
-                        mightyplayer2.raceboardname = raceboardFormatter(number, mightyplayer2.namecolor, mightyplayer2.cuttedname, mightyplayer2.besttimes.get(0).getString());
+                        mightyplayer2.raceboardname = raceboardFormatter(number, mightyplayer2.namecolor, mightyplayer2.cuttedname, (mightyplayer2.besttimes.isEmpty() ? NO_TIME : mightyplayer2.besttimes.get(0).getString()));
                     }
                     MightyScoreBoard.raceboardSetPlayer(mightyplayer2.raceboardname,scoreboard,score2);
                 }else{
@@ -715,40 +722,19 @@ public class MightyRacingCommand {
     private static void bestReset() {
         for (MightyPlayer mightyplayer : MightyPlayer.list.values()) {
             mightyplayer.besttimes.clear();
-            for (int i = 0; i < 10; i++) {
-                mightyplayer.besttimes.add(new MightyTime(95995));
-            }
         }
     }
-    private static void bestSet(String name, Map<Integer,MightyTime> times) {
+    private static void bestSet(String name, List<MightyTime> times) {
         MightyPlayer mightyplayer = MightyPlayer.list.get(name);
         mightyplayer.besttimes.clear();
-        for (int i=0;i<10;i++){
-            int time;
-            if (!times.containsKey(i)){
-                time = 95995;
-            }else{
-                time = times.get(i).getInt();
-            }
-            mightyplayer.besttimes.add(new MightyTime(time));
-        }
+        mightyplayer.besttimes.addAll(times);
     }
     private static void trackBestLoad(String trackname, String name){
         MightyPlayer mightyplayer = MightyPlayer.list.get(name);
         mightyplayer.besttimes.clear();
         int[] fromTimes = MightyData.getTime(((IEntityDataSaver) mightyplayer.player),trackname);
-        if (fromTimes.length == 0){
-            trackBestReset(trackname,name);
-        }else{
-            for (int i=0;i<10;i++){
-                int time;
-                if (fromTimes.length<=i){
-                    time = 95995;
-                }else{
-                    time = fromTimes[i];
-                }
-                mightyplayer.besttimes.add(new MightyTime(time));
-            }
+        for (int i : fromTimes){
+            mightyplayer.besttimes.add(i==-1 ? null : new MightyTime(i));
         }
     }
     private static void trackBestLoadAll(String trackname){
@@ -757,51 +743,21 @@ public class MightyRacingCommand {
             String name = listentry.getKey();
             mightyplayer.besttimes.clear();
             int[] fromTimes = MightyData.getTime(((IEntityDataSaver) mightyplayer.player), trackname);
-            if (fromTimes.length == 0) {
-                trackBestReset(trackname, name);
-            } else {
-                for (int i = 0; i < 10; i++) {
-                    int time;
-                    if (fromTimes.length <= i) {
-                        time = 95995;
-                    } else {
-                        time = fromTimes[i];
-                    }
-                    mightyplayer.besttimes.add(new MightyTime(time));
-                }
+            for (int i : fromTimes){
+                mightyplayer.besttimes.add(i==-1 ? null : new MightyTime(i));
             }
         }
     }
-    private static void trackBestReset(String trackname, String name) {
-        MightyPlayer mightyplayer = MightyPlayer.list.get(name);
-        if (racingstatus == PRACTICE) {
-            mightyplayer.besttimes.clear();
-        }
-        List<Integer> times = new ArrayList<>();
-        for (int i=0;i<10;i++){
-            times.add(95995);
-            if (racingstatus == PRACTICE) {
-                mightyplayer.besttimes.add(new MightyTime(95995));
-            }
-        }
-        MightyData.putTime(((IEntityDataSaver) mightyplayer.player),trackname,times);
+    private static void trackBestReset(String trackname, ServerPlayerEntity player) {
+        MightyData.removeTime(((IEntityDataSaver) player),trackname);
     }
-    private static void trackBestSet(String trackname, String name, Map<Integer,MightyTime> times) {
+    private static void trackBestSet(String trackname, String name, List<MightyTime> times) {
         MightyPlayer mightyplayer = MightyPlayer.list.get(name);
         mightyplayer.besttimes.clear();
         List<Integer> toTimes = new ArrayList<>();
-        for (int i=0;i<10;i++){
-            int time;
-            if (!times.containsKey(i)){
-                time = 95995;
-            }else{
-                time = times.get(i).getInt();
-                toTimes.add(time);
-            }
-            mightyplayer.besttimes.add(new MightyTime(time));
-        }
+        times.forEach(entry -> toTimes.add((entry==null ? -1 : entry.getInt())));
+        mightyplayer.besttimes.addAll(times);
         MightyData.putTime(((IEntityDataSaver) mightyplayer.player),trackname,toTimes);
-
     }
     public static void broadcastToDrivers(Text message) {
         for (MightyPlayer mightyplayer : MightyPlayer.list.values()){
