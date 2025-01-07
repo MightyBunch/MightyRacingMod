@@ -438,10 +438,10 @@ public class MightyRacingCommand {
             if (MightyPlayer.list.containsKey(name)) {
                 continue;
             }
-            if (racingstatus==QUALI){
+            if (racingstatus==QUALI && qualistage!=QSTARTING){
                 player.sendMessageToClient(Text.literal("You can't change status during " + QUALINAME),false);
                 continue;
-            }else if (racingstatus==RACING){
+            }else if (racingstatus==RACING && racestage!=RSTARTING){
                 player.sendMessageToClient(Text.literal("You can't change status during " + RACINGNAME),false);
                 continue;
             }
@@ -455,6 +455,10 @@ public class MightyRacingCommand {
             Scoreboard scoreboard = source.getServer().getScoreboard();
             if (racingstatus == PRACTICE) {
                 trackBestLoad(track, name);
+                raceboardPutSort(scoreboard, name, CWHITE);
+            }else if (racingstatus == RACING) {
+                raceboardPutSort(scoreboard, name, CWHITE);
+            }if (racingstatus == QUALI) {
                 raceboardPutSort(scoreboard, name, CWHITE);
             }
             MightyRacingMod.LOGGER.info("Player " + name + " was added to the racing system!");
@@ -480,7 +484,7 @@ public class MightyRacingCommand {
         return calls;
     }
     private static int racestatus(ServerCommandSource source, int status, String trackname, int minutes, int laps){
-        if (racingstatus == status){
+        if (racingstatus == status || Objects.equals(trackname, "name")){
             return 0;
         }
         MightyPlayer.allToZero();
@@ -548,6 +552,9 @@ public class MightyRacingCommand {
     }
     private static int timereset(ServerCommandSource source, Collection<ServerPlayerEntity> targets ,String trackname) {
         int calls = 0;
+        if (Objects.equals(trackname, "name")){
+            return 0;
+        }
         for (ServerPlayerEntity player : targets) {
             String name = player.getGameProfile().getName();
             trackBestReset(trackname, player);
