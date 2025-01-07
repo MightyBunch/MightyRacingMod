@@ -12,7 +12,7 @@ public class MightyPlayer {
    public ServerPlayerEntity player;
    public LocalDateTime starttime;
    public List<MightyTime> besttimes;
-   public Map<Integer,MightyTime> currenttimes;
+   public List<MightyTime> currenttimes;
    public int sector;
    public int lap;
    public static Map<String, MightyPlayer> list = new HashMap<>();
@@ -30,7 +30,7 @@ public class MightyPlayer {
       this.raceboardname = null;
       this.interval = "§c+0:00:00";
       this.besttimes = new ArrayList<>();
-      this.currenttimes = new HashMap<>();
+      this.currenttimes = new ArrayList<>();
       this.cuttedname = null;
       this.namecolor = "§f";
       this.stops = 0;
