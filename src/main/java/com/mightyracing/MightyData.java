@@ -14,6 +14,10 @@ public class MightyData {
         NbtCompound nbt = player.getPersistentData();
         return nbt.getIntArray(track);
     }
+    public static void removeTime(IEntityDataSaver player, String track){
+        NbtCompound nbt = player.getPersistentData();
+        nbt.remove(track);
+    }
     public static void putName(IEntityDataSaver player, String cuttedname){
         NbtCompound nbt = player.getPersistentData();
         nbt.putString("name", cuttedname);
