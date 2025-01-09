@@ -573,22 +573,20 @@ public class MightyRacingCommand {
         if (!source.isExecutedByPlayer()){
             return 0;
         }
-        if (racingstatus != OFFLINE){
-            Objects.requireNonNull(source.getPlayer()).sendMessageToClient(Text.literal("You can change your raceboard name only if race is " + OFFLINENAME),false);
+        String name = Objects.requireNonNull(source.getPlayer()).getGameProfile().getName();
+        if (MightyPlayer.list.containsKey(name) && racingstatus != OFFLINE){
+            Objects.requireNonNull(source.getPlayer()).sendMessageToClient(Text.literal("You can't change your raceboard name when you are a " + DRIVERNAME + " and racestatus is not " + OFFLINENAME),false);
             return 0;
         }
         if (cuttedname.length() < 3){
-            Objects.requireNonNull(source.getPlayer()).sendMessageToClient(Text.literal("Your raceboard name has to contain 3 symbols"),false);
+            Objects.requireNonNull(source.getPlayer()).sendMessageToClient(Text.literal("Your raceboard name has to contain at least 3 symbols"),false);
             return 0;
         }
-        String name = Objects.requireNonNull(source.getPlayer()).getGameProfile().getName();
-        if (!MightyPlayer.list.containsKey(name)) {
-            Objects.requireNonNull(source.getPlayer()).sendMessageToClient(Text.literal("You must be " + DRIVERNAME + CWHITE + " to change your raceboard name"),false);
-            return 0;
-        }
-        MightyPlayer mightyplayer = MightyPlayer.list.get(name);
         cuttedname = cutName(cuttedname);
-        mightyplayer.cuttedname=cuttedname;
+        if (MightyPlayer.list.containsKey(name)){
+            MightyPlayer mightyplayer = MightyPlayer.list.get(name);
+            mightyplayer.cuttedname=cuttedname;
+        }
         MightyData.putName(((IEntityDataSaver)source.getPlayer()),cuttedname);
         Objects.requireNonNull(source.getPlayer()).sendMessageToClient(Text.literal("Your raceboard name has changed to " + cuttedname),false);
         return 1;
