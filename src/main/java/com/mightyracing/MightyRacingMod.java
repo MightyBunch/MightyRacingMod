@@ -1,5 +1,6 @@
 package com.mightyracing;
 
+import com.mightyracing.config.MightyConfig;
 import com.mightyracing.events.MightyDataCopy;
 import com.mightyracing.events.MightyTick;
 import com.mightyracing.events.PlayerDisconnect;
@@ -22,6 +23,8 @@ public class MightyRacingMod implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		LOGGER.info("MightyRacingMod initializing...");
+
+		MightyConfig.register();
 
 		CommandRegistrationCallback.EVENT.register(MightyRacingCommand::register);
 
