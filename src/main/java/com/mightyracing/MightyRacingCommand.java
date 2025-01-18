@@ -74,7 +74,7 @@ public class MightyRacingCommand {
                                         )
                                 )
                                 .then(CommandManager.literal("lap")
-                                        .then(CommandManager.argument("number", IntegerArgumentType.integer(1, 99))
+                                        .then(CommandManager.argument("number", IntegerArgumentType.integer(2, 100))
                                                 .executes(context -> lap(context.getSource(), EntityArgumentType.getPlayers(context, "targets"), IntegerArgumentType.getInteger(context, "number")))
                                         )
                                 )
@@ -84,7 +84,7 @@ public class MightyRacingCommand {
                                         )
                                 )
                                 .then(CommandManager.literal("pitexit")
-                                        .then(CommandManager.argument("number", IntegerArgumentType.integer(1, 99))
+                                        .then(CommandManager.argument("number", IntegerArgumentType.integer(2, 100))
                                                 .executes(context -> pitexit(context.getSource(), EntityArgumentType.getPlayers(context, "targets"), IntegerArgumentType.getInteger(context, "number")))
                                         )
                                 )
@@ -157,7 +157,7 @@ public class MightyRacingCommand {
                 continue;
             }
             MightyPlayer mightyplayer = MightyPlayer.list.get(name);
-            if (mightyplayer.sector >= number) {
+            if (mightyplayer.sector >= number || mightyplayer.sector + 1 + MightyConfig.getInteger("checkpoint_precision") < number) {
                 continue;
             }
             LocalDateTime start = mightyplayer.starttime;
@@ -198,7 +198,7 @@ public class MightyRacingCommand {
             }
             MightyPlayer mightyplayer = MightyPlayer.list.get(name);
             LocalDateTime start = mightyplayer.starttime;
-            if (mightyplayer.sector < number && start != null) {
+            if ((mightyplayer.sector >= number || mightyplayer.sector == 0 || mightyplayer.sector + 1 + MightyConfig.getInteger("checkpoint_precision") < number) && start != null) {
                 continue;
             }
             if (now == null) {
