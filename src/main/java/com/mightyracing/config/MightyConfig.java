@@ -35,6 +35,8 @@ public class MightyConfig {
 
     private static String getProvider(){
         String provider = "";
+        provider += "# Setting this to false allows lapped drivers to complete all their laps, even after another driver finishes.\n";
+        provider += propertyReg("auto_finish",true);
         while (provider.endsWith("\n")) {
             provider = provider.substring(0, provider.length() - 1);
         }
