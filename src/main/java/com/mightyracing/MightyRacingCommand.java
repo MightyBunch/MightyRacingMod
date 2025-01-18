@@ -1,5 +1,6 @@
 package com.mightyracing;
 
+import com.mightyracing.config.MightyConfig;
 import com.mightyracing.util.IEntityDataSaver;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
@@ -288,7 +289,9 @@ public class MightyRacingCommand {
                                 }
                                 raceboardPutSort(scoreboard, name, (fastest == mightyplayer) ? CPURPLE : CWHITE);
                                 if (mightyplayer.lap >= racelaps){
-                                    racestage = RENDING;
+                                    if (MightyConfig.getBoolean("auto_finish")) {
+                                        racestage = RENDING;
+                                    }
                                     raceboardDisplay(scoreboard,RACINGNAME + CGRAY + "  " + racelaps + "/" + racelaps);
                                     player.sendMessageToClient(Text.literal("You finished the race!"),false);
                                     raceboardPutOnlyNamecolor(scoreboard, name, (fastest == mightyplayer) ? CDPURPLE : CLGRAY);
