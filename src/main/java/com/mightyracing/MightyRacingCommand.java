@@ -394,9 +394,6 @@ public class MightyRacingCommand {
                     }
                 }
                 case RACING -> {
-                    if (mightyplayer.sector >= number) {
-                        continue;
-                    }
                     Collection<ServerPlayerEntity> target1 = new ArrayList<>(){};
                     target1.add(player);
                     sector(source, target1, number);
