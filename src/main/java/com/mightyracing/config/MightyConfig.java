@@ -38,7 +38,9 @@ public class MightyConfig {
         provider += "# Setting this to false allows lapped drivers to complete all their laps, even after another driver finishes.\n";
         provider += propertyReg("auto_finish",true) + "\n";
         provider += "# This setting determines how many checkpoints can be skipped for the next one to count. A value of 0 means all previous checkpoints must be passed.\n";
-        provider += propertyReg("checkpoint_precision",0,0,10);
+        provider += propertyReg("checkpoint_precision",0,0,10) + "\n";
+        provider += "# This setting specifies the number of mandatory pit stops required during the race.\n";
+        provider += propertyReg("mandatory_pit_stops",0,0,10);
         while (provider.endsWith("\n")) {
             provider = provider.substring(0, provider.length() - 1);
         }
