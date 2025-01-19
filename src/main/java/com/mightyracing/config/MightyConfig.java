@@ -40,7 +40,9 @@ public class MightyConfig {
         provider += "# This setting determines how many checkpoints can be skipped for the next one to count. A value of 0 means all previous checkpoints must be passed.\n";
         provider += propertyReg("checkpoint_precision",0,0,10) + "\n";
         provider += "# This setting specifies the number of mandatory pit stops required during the race.\n";
-        provider += propertyReg("mandatory_pit_stops",0,0,10);
+        provider += propertyReg("mandatory_pit_stops",0,0,10) + "\n";
+        provider += "# This setting controls whether broadcast messages (e.g. new fastest lap or racestatus changes) are sent to all players or only drivers.\n";
+        provider += propertyReg("broadcast_only_to_drivers",true);
         while (provider.endsWith("\n")) {
             provider = provider.substring(0, provider.length() - 1);
         }

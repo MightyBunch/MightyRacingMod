@@ -9,6 +9,7 @@ import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.scoreboard.ScoreboardObjective;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -260,7 +261,7 @@ public class MightyRacingCommand {
                                     raceboardPutOnlyNamecolor(scoreboard, name, CLGRAY);
                                 }
                                 mightyplayer.starttime = null;
-                                checkQualiEnd();
+                                checkQualiEnd(source.getServer());
                             }
                         }
                     }
@@ -276,12 +277,12 @@ public class MightyRacingCommand {
                                         if (MightyTime.compare(mightydelta, fastest.besttimes.get(0))) {
                                             raceboardPutOnlyNamecolor(scoreboard, fastest.player.getGameProfile().getName(), CWHITE);
                                             fastest = mightyplayer;
-                                            broadcastToDrivers(Text.literal("New fastest lap: " + mightyplayer.cuttedname + " " + CPURPLE + CBOLD + mightydelta.getString()));
+                                            broadcastToDrivers(source.getServer(),Text.literal("New fastest lap: " + mightyplayer.cuttedname + " " + CPURPLE + CBOLD + mightydelta.getString()));
                                         } else {
                                             player.sendMessageToClient(Text.literal("Your new best time is: " + CGREEN + CBOLD + mightydelta.getString()),false);
                                         }
                                     }else{
-                                        broadcastToDrivers(Text.literal("New fastest lap: " + mightyplayer.cuttedname + " " + CPURPLE + CBOLD + mightydelta.getString()));
+                                        broadcastToDrivers(source.getServer(),Text.literal("New fastest lap: " + mightyplayer.cuttedname + " " + CPURPLE + CBOLD + mightydelta.getString()));
                                         fastest = mightyplayer;
                                     }
                                 } else {
@@ -296,7 +297,7 @@ public class MightyRacingCommand {
                                     player.sendMessageToClient(Text.literal("You finished the race!"),false);
                                     raceboardPutOnlyNamecolor(scoreboard, name, (fastest == mightyplayer) ? CDPURPLE : CLGRAY);
                                     mightyplayer.starttime = null;
-                                    checkRaceEnd();
+                                    checkRaceEnd(source.getServer());
                                 }else{
                                     if (mightyplayer.lap + 1 > racecurlap) {
                                         racecurlap = mightyplayer.lap + 1;
@@ -321,12 +322,12 @@ public class MightyRacingCommand {
                                         if (MightyTime.compare(mightydelta, fastest.besttimes.get(0))) {
                                             raceboardPutOnlyNamecolor(scoreboard, fastest.player.getGameProfile().getName(), (fastest.namecolor.equals(CDPURPLE)) ? CLGRAY : CWHITE);
                                             fastest = mightyplayer;
-                                            broadcastToDrivers(Text.literal("New fastest lap: " + mightyplayer.cuttedname + " " + CPURPLE + CBOLD + mightydelta.getString()));
+                                            broadcastToDrivers(source.getServer(),Text.literal("New fastest lap: " + mightyplayer.cuttedname + " " + CPURPLE + CBOLD + mightydelta.getString()));
                                         } else {
                                             player.sendMessageToClient(Text.literal("Your new best time is: " + CGREEN + CBOLD + mightydelta.getString()),false);
                                         }
                                     }else{
-                                        broadcastToDrivers(Text.literal("New fastest lap: " + mightyplayer.cuttedname + " " + CPURPLE + CBOLD + mightydelta.getString()));
+                                        broadcastToDrivers(source.getServer(),Text.literal("New fastest lap: " + mightyplayer.cuttedname + " " + CPURPLE + CBOLD + mightydelta.getString()));
                                         fastest = mightyplayer;
                                     }
                                 } else {
@@ -335,7 +336,7 @@ public class MightyRacingCommand {
                                 raceboardPutSort(scoreboard, name, (fastest == mightyplayer) ? CDPURPLE : CLGRAY);
                                 player.sendMessageToClient(Text.literal("You finished the race!"),false);
                                 mightyplayer.starttime = null;
-                                checkRaceEnd();
+                                checkRaceEnd(source.getServer());
                             }
                         }
                     }
@@ -384,7 +385,7 @@ public class MightyRacingCommand {
                             mightyplayer.sector = 0;
                             mightyplayer.starttime = null;
                             mightyplayer.interval = CRED + "+0:00:00";
-                            checkQualiEnd();
+                            checkQualiEnd(source.getServer());
                             raceboardPutOnlyNamecolor(scoreboard, name, CLGRAY);
                         }
                         case QENDED -> {
@@ -494,7 +495,7 @@ public class MightyRacingCommand {
         switch (status) {
             case OFFLINE -> {
                 raceboardNotDisplay(scoreboard);
-                broadcastToDrivers(Text.literal("Race status switched to " + OFFLINENAME));
+                broadcastToDrivers(source.getServer(),Text.literal("Race status switched to " + OFFLINENAME));
             }
             case PRACTICE -> {
                 track = trackname;
@@ -504,7 +505,7 @@ public class MightyRacingCommand {
                     raceboardPutSort(scoreboard, name, CWHITE);
                 }
                 raceboardDisplay(scoreboard,PRACTICENAME);
-                broadcastToDrivers(Text.literal("Race status switched to " + PRACTICENAME));
+                broadcastToDrivers(source.getServer(),Text.literal("Race status switched to " + PRACTICENAME));
             }
             case QUALI -> {
                 qualistage = QSTARTING;
@@ -516,7 +517,7 @@ public class MightyRacingCommand {
                     raceboardPutSort(scoreboard, name, CWHITE);
                 }
                 raceboardDisplay(scoreboard,QUALINAME + " " + mightydelta.getString());
-                broadcastToDrivers(Text.literal("Race status switched to " + QUALINAME));
+                broadcastToDrivers(source.getServer(),Text.literal("Race status switched to " + QUALINAME));
             }
             case RACING -> {
                 racestage = RSTARTING;
@@ -529,7 +530,7 @@ public class MightyRacingCommand {
                     raceboardPutSort(scoreboard, name, CWHITE);
                 }
                 raceboardDisplay(scoreboard,RACINGNAME + CWHITE + "  1/" + laps);
-                broadcastToDrivers(Text.literal("Race status switched to " + RACINGNAME));
+                broadcastToDrivers(source.getServer(),Text.literal("Race status switched to " + RACINGNAME));
             }
         }
         return 1;
@@ -764,12 +765,18 @@ public class MightyRacingCommand {
         mightyplayer.besttimes.addAll(times);
         MightyData.putTime(((IEntityDataSaver) mightyplayer.player),trackname,toTimes);
     }
-    public static void broadcastToDrivers(Text message) {
-        for (MightyPlayer mightyplayer : MightyPlayer.list.values()){
-            mightyplayer.player.sendMessageToClient(message,false);
+    public static void broadcastToDrivers(MinecraftServer server, Text message) {
+        if (MightyConfig.getBoolean("broadcast_only_to_drivers")){
+            for (MightyPlayer mightyplayer : MightyPlayer.list.values()){
+                mightyplayer.player.sendMessageToClient(message,false);
+            }
+        }else{
+            for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()){
+                player.sendMessageToClient(message,false);
+            }
         }
     }
-    public static void checkQualiEnd(){
+    public static void checkQualiEnd(MinecraftServer server){
         for (Map.Entry<String, MightyPlayer> listentry : MightyPlayer.list.entrySet()){
             MightyPlayer mightyplayer = listentry.getValue();
             if (mightyplayer.starttime != null){
@@ -777,9 +784,9 @@ public class MightyRacingCommand {
             }
         }
         qualistage = QENDED;
-        broadcastToDrivers(Text.literal(QUALINAME + CWHITE + " is over!"));
+        broadcastToDrivers(server,Text.literal(QUALINAME + CWHITE + " is over!"));
     }
-    public static void checkRaceEnd(){
+    public static void checkRaceEnd(MinecraftServer server){
         for (Map.Entry<String, MightyPlayer> listentry : MightyPlayer.list.entrySet()){
             MightyPlayer mightyplayer = listentry.getValue();
             if (mightyplayer.starttime != null){
@@ -787,7 +794,7 @@ public class MightyRacingCommand {
             }
         }
         racestage = RENDED;
-        broadcastToDrivers(Text.literal(RACINGNAME + CWHITE + " is over!"));
+        broadcastToDrivers(server,Text.literal(RACINGNAME + CWHITE + " is over!"));
         StringBuilder stopstring = new StringBuilder();
         int required = MightyConfig.getInteger("mandatory_pit_stops");
         for (Map.Entry<String, MightyPlayer> listentry : MightyPlayer.list.entrySet()){
@@ -798,7 +805,7 @@ public class MightyRacingCommand {
         }
         if (!stopstring.isEmpty()) {
             stopstring = new StringBuilder(stopstring.substring(0, stopstring.length() - 2) + ".");
-            broadcastToDrivers(Text.literal("Drivers who failed to make required pit stops: " + stopstring));
+            broadcastToDrivers(server,Text.literal("Drivers who failed to make required pit stops: " + stopstring));
         }
     }
     private static String cutName(String cuttedname){
