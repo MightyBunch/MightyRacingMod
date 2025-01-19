@@ -788,6 +788,18 @@ public class MightyRacingCommand {
         }
         racestage = RENDED;
         broadcastToDrivers(Text.literal(RACINGNAME + CWHITE + " is over!"));
+        StringBuilder stopstring = new StringBuilder();
+        int required = MightyConfig.getInteger("mandatory_pit_stops");
+        for (Map.Entry<String, MightyPlayer> listentry : MightyPlayer.list.entrySet()){
+            MightyPlayer mightyplayer = listentry.getValue();
+            if (mightyplayer.stops < required){
+                stopstring.append(mightyplayer.cuttedname).append(", ");
+            }
+        }
+        if (!stopstring.isEmpty()) {
+            stopstring = new StringBuilder(stopstring.substring(0, stopstring.length() - 2) + ".");
+            broadcastToDrivers(Text.literal("Drivers who failed to make required pit stops: " + stopstring));
+        }
     }
     private static String cutName(String cuttedname){
         cuttedname = cuttedname.toUpperCase();
