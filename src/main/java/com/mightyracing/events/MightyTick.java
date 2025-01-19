@@ -36,7 +36,7 @@ public class MightyTick implements ServerTickEvents.EndTick{
                     if (!name.equals(MightyRacingCommand.raceboarddisplayname)) {
                         if (mightydelta.m == 0 && mightydelta.s == 0) {
                             MightyRacingCommand.qualistage = QENDING;
-                            MightyRacingCommand.checkQualiEnd();
+                            MightyRacingCommand.checkQualiEnd(server);
                             for (Map.Entry<String, MightyPlayer> listentry : MightyPlayer.list.entrySet()){
                                 MightyPlayer mightyplayer = listentry.getValue();
                                 if (mightyplayer.starttime == null){
