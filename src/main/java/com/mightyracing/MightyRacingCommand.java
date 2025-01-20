@@ -64,6 +64,7 @@ public class MightyRacingCommand {
     public static MightyPlayer fastest = null;
     public static int racingstatus = 0;
     public static LocalDateTime qualiend = null;
+    public static int racestops = 0;
     public static String raceboarddisplayname = "MRM_raceboard";
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess ignoredCommandRegistryAccess, CommandManager.RegistrationEnvironment ignoredRegistrationEnvironment) {
         dispatcher.register(CommandManager.literal("mightyracing")
@@ -129,12 +130,31 @@ public class MightyRacingCommand {
                                         )
                                 )
                         )
-                        .then(CommandManager.literal("start")
-                                .then(CommandManager.literal("quali")
+                        .then(CommandManager.literal("race")
+                                .then(CommandManager.literal("start")
+                                        .executes(context -> racestart(context.getSource()))
+                                )
+                                .then(CommandManager.literal("change")
+                                        .then(CommandManager.literal("laps")
+                                                .then(CommandManager.argument("laps", IntegerArgumentType.integer(1, 99))
+                                                        .executes(context -> changelaps(context.getSource(),IntegerArgumentType.getInteger(context, "laps")))
+                                                )
+                                        )
+                                        .then(CommandManager.literal("pitstops")
+                                                .then(CommandManager.argument("pitstops", IntegerArgumentType.integer(0, 10))
+                                                        .executes(context -> changestops(context.getSource(),IntegerArgumentType.getInteger(context, "pitstops")))
+                                                )
+                                        )
+                                )
+                        )
+                        .then(CommandManager.literal("quali")
+                                .then(CommandManager.literal("start")
                                         .executes(context -> qualistart(context.getSource()))
                                 )
-                                .then(CommandManager.literal("race")
-                                        .executes(context -> racestart(context.getSource()))
+                                .then(CommandManager.literal("change")
+                                        .then(CommandManager.argument("minutes", IntegerArgumentType.integer(1, 60))
+                                                .executes(context -> changeminutes(context.getSource(),IntegerArgumentType.getInteger(context, "minutes")))
+                                        )
                                 )
                         )
                 )
@@ -524,6 +544,7 @@ public class MightyRacingCommand {
                 fastest = null;
                 racecurlap = 0;
                 racelaps = laps;
+                racestops = MightyConfig.getInteger("mandatory_pit_stops");
                 bestReset();
                 for (Map.Entry<String, MightyPlayer> listentry : MightyPlayer.list.entrySet()) {
                     String name = listentry.getKey();
@@ -590,6 +611,32 @@ public class MightyRacingCommand {
         }
         MightyData.putName(((IEntityDataSaver)source.getPlayer()),cuttedname);
         Objects.requireNonNull(source.getPlayer()).sendMessageToClient(Text.literal("Your raceboard name has changed to " + cuttedname),false);
+        return 1;
+    }
+    private static int changelaps(ServerCommandSource source, int laps){
+        if (racingstatus != RACING || racestage != RSTARTING){
+            return 0;
+        }
+        racelaps = laps;
+        Scoreboard scoreboard = source.getServer().getScoreboard();
+        raceboardDisplay(scoreboard,RACINGNAME + CWHITE + "  1/" + laps);
+        return 1;
+    }
+    private static int changestops(ServerCommandSource source, int stops){
+        if (racingstatus != RACING || racestage != RSTARTING){
+            return 0;
+        }
+        racestops = stops;
+        return 1;
+    }
+    private static int changeminutes(ServerCommandSource source, int minutes){
+        if (racingstatus != QUALI || racestage != QSTARTING){
+            return 0;
+        }
+        qualitime = minutes;
+        MightyQualiTime mightydelta = new MightyQualiTime(minutes);
+        Scoreboard scoreboard = source.getServer().getScoreboard();
+        raceboardDisplay(scoreboard,QUALINAME + " " + mightydelta.getString());
         return 1;
     }
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
