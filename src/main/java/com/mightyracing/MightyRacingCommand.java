@@ -96,21 +96,24 @@ public class MightyRacingCommand {
                         )
                         .then(CommandManager.literal("racestatus")
                                 .then(CommandManager.literal("offline")
-                                        .executes(context -> racestatus(context.getSource(), OFFLINE,null, 0, 0))
+                                        .executes(context -> racestatus(context.getSource(), OFFLINE,null, 0, 0,0))
                                 )
                                 .then(CommandManager.literal("practice")
                                         .then(CommandManager.argument("track", StringArgumentType.string())
-                                                .executes(context -> racestatus(context.getSource(), PRACTICE, StringArgumentType.getString(context,"track"), 0, 0))
+                                                .executes(context -> racestatus(context.getSource(), PRACTICE, StringArgumentType.getString(context,"track"), 0, 0,0))
                                         )
                                 )
                                 .then(CommandManager.literal("quali")
                                         .then(CommandManager.argument("minutes", IntegerArgumentType.integer(1, 60))
-                                                .executes(context -> racestatus(context.getSource(), QUALI,null,IntegerArgumentType.getInteger(context, "minutes"),0))
+                                                .executes(context -> racestatus(context.getSource(), QUALI,null,IntegerArgumentType.getInteger(context, "minutes"),0,0))
                                         )
                                 )
                                 .then(CommandManager.literal("racing")
                                         .then(CommandManager.argument("laps", IntegerArgumentType.integer(1, 99))
-                                                .executes(context -> racestatus(context.getSource(), RACING,null,0,IntegerArgumentType.getInteger(context, "laps")))
+                                                .executes(context -> racestatus(context.getSource(), RACING,null,0,IntegerArgumentType.getInteger(context, "laps"),0))
+                                                .then(CommandManager.argument("pitstops", IntegerArgumentType.integer(1, 10))
+                                                        .executes(context -> racestatus(context.getSource(), RACING,null,0,IntegerArgumentType.getInteger(context, "laps"),IntegerArgumentType.getInteger(context, "pitstops")))
+                                                )
                                         )
                                 )
                         )
@@ -495,7 +498,7 @@ public class MightyRacingCommand {
         }
         return calls;
     }
-    private static int racestatus(ServerCommandSource source, int status, String trackname, int minutes, int laps){
+    private static int racestatus(ServerCommandSource source, int status, String trackname, int minutes, int laps, int stops){
         if (racingstatus == status || Objects.equals(trackname, "name")){
             return 0;
         }
@@ -535,7 +538,7 @@ public class MightyRacingCommand {
                 fastest = null;
                 racecurlap = 0;
                 racelaps = laps;
-                racestops = MightyConfig.getInteger("mandatory_pit_stops");
+                racestops = stops;
                 bestReset();
                 for (Map.Entry<String, MightyPlayer> listentry : MightyPlayer.list.entrySet()) {
                     String name = listentry.getKey();
