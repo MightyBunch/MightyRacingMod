@@ -2,6 +2,7 @@ package com.mightyracing.events;
 
 import com.mightyracing.*;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.minecraft.client.resource.language.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.text.Text;
@@ -32,7 +33,7 @@ public class MightyTick implements ServerTickEvents.EndTick{
                     LocalDateTime now = LocalDateTime.now();
                     Duration delta = Duration.between(now, MightyRacingCommand.qualiend);
                     MightyQualiTime mightydelta = new MightyQualiTime(delta);
-                    String name = MightyRacingCommand.QUALINAME + " " + mightydelta.getString();
+                    String name = I18n.translate("shortcut.quali") + " " + mightydelta.getString();
                     if (!name.equals(MightyRacingCommand.raceboarddisplayname)) {
                         if (mightydelta.m == 0 && mightydelta.s == 0) {
                             MightyRacingCommand.qualistage = QENDING;
