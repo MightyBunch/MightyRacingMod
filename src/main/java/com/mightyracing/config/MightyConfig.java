@@ -85,6 +85,25 @@ public class MightyConfig {
         return defComment + key + "=" + intValue + "\n";
     }
 
+    private static String propertyReg(String key,Float defaultValue, Float min, Float max){
+        String defComment = "# Min: " + min + "\n# Max: " + max + "\n# Default: " + defaultValue + "\n";
+        if (!properties.containsKey(key)){
+            properties.setProperty(key, String.valueOf(defaultValue));
+            return defComment + key + "=" + defaultValue + "\n";
+        }
+        Float floatValue = defaultValue;
+        try {
+            floatValue = Float.parseFloat(properties.getProperty(key));
+            if (floatValue < min || floatValue > max){
+                floatValue = defaultValue;
+                properties.setProperty(key, String.valueOf(defaultValue));
+            }
+        } catch (Exception ignored) {
+            properties.setProperty(key, String.valueOf(defaultValue));
+        }
+        return defComment + key + "=" + floatValue + "\n";
+    }
+
     public static String getString(String key){
         return properties.getProperty(key);
     }
@@ -95,5 +114,9 @@ public class MightyConfig {
 
     public static Integer getInteger(String key){
         return Integer.parseInt(properties.getProperty(key));
+    }
+
+    public static Float getFloat(String key){
+        return Float.parseFloat(properties.getProperty(key));
     }
 }
