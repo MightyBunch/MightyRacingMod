@@ -654,11 +654,7 @@ public class MightyRacingCommand {
         mightyplayer.namecolor = namecolor;
         int len = MightyPlayer.list.size();
         int number = (scr - len) * -1;
-        if (racingstatus == RACING){
-            mightyplayer.raceboardname = raceboardFormatter(number, mightyplayer.namecolor, mightyplayer.cuttedname, (mightyplayer.lap < 10 ? "0" : "") + (mightyplayer.lap == -1 ? 0 : mightyplayer.lap) + "l " + (mightyplayer.sector < 10 ? "0" : "") + mightyplayer.sector + "s");
-        }else {
-            mightyplayer.raceboardname = raceboardFormatter(number, mightyplayer.namecolor, mightyplayer.cuttedname, (mightyplayer.besttimes.isEmpty() ? I18n.translate("shortcut.notime") : mightyplayer.besttimes.get(0).getString()));
-        }
+        mightyplayer.raceboardname = raceboardFormatter(number, mightyplayer);
         MightyScoreBoard.raceboardSetPlayer(mightyplayer.raceboardname,scoreboard,scr);
     }
     public static void raceboardPutSort(Scoreboard scoreboard, String name, String namecolor){
@@ -700,11 +696,7 @@ public class MightyRacingCommand {
                 }
                 MightyScoreBoard.raceboardResetPlayer(mightyplayer2.raceboardname,scoreboard);
                 int number = (score - len) * -1;
-                if (racingstatus == RACING){
-                    mightyplayer2.raceboardname = raceboardFormatter(number, mightyplayer2.namecolor, mightyplayer2.cuttedname, (mightyplayer2.lap < 10 ? "0" : "") + (mightyplayer2.lap == -1 ? 0 : mightyplayer2.lap) + "l " + (mightyplayer2.sector < 10 ? "0" : "") + mightyplayer2.sector + "s");
-                }else {
-                    mightyplayer2.raceboardname = raceboardFormatter(number, mightyplayer2.namecolor, mightyplayer2.cuttedname, (mightyplayer2.besttimes.isEmpty() ? I18n.translate("shortcut.notime") : mightyplayer2.besttimes.get(0).getString()));
-                }
+                mightyplayer2.raceboardname = raceboardFormatter(number, mightyplayer2);
                 MightyScoreBoard.raceboardSetPlayer(mightyplayer2.raceboardname,scoreboard,score);
             }else{
                 if (mightyplayer1.raceboardname == null) {
@@ -717,11 +709,7 @@ public class MightyRacingCommand {
             MightyScoreBoard.raceboardResetPlayer(mightyplayer1.raceboardname,scoreboard);
         }
         int number = (scr - len) * -1;
-        if (racingstatus == RACING){
-            mightyplayer1.raceboardname = raceboardFormatter(number, mightyplayer1.namecolor, mightyplayer1.cuttedname, (mightyplayer1.lap < 10 ? "0" : "") + (mightyplayer1.lap == -1 ? 0 : mightyplayer1.lap) + "l " + (mightyplayer1.sector < 10 ? "0" : "") + mightyplayer1.sector + "s");
-        }else {
-            mightyplayer1.raceboardname = raceboardFormatter(number, mightyplayer1.namecolor, mightyplayer1.cuttedname, (mightyplayer1.besttimes.isEmpty() ? I18n.translate("shortcut.notime") : mightyplayer1.besttimes.get(0).getString()));
-        }
+        mightyplayer1.raceboardname = raceboardFormatter(number, mightyplayer1);
         MightyScoreBoard.raceboardSetPlayer(mightyplayer1.raceboardname,scoreboard,scr);
     }
     public static void raceboardRemoveSort(Scoreboard scoreboard, String name){
@@ -740,11 +728,7 @@ public class MightyRacingCommand {
                 if (score1 > score2){
                     MightyScoreBoard.raceboardResetPlayer(mightyplayer2.raceboardname,scoreboard);
                     int number = (score2 - len + 1) * -1;
-                    if (racingstatus == RACING){
-                        mightyplayer2.raceboardname = raceboardFormatter(number, mightyplayer2.namecolor, mightyplayer2.cuttedname, (mightyplayer2.lap < 10 ? "0" : "") + (mightyplayer2.lap == -1 ? 0 : mightyplayer2.lap) + "l " + (mightyplayer2.sector < 10 ? "0" : "") + mightyplayer2.sector + "s");
-                    }else{
-                        mightyplayer2.raceboardname = raceboardFormatter(number, mightyplayer2.namecolor, mightyplayer2.cuttedname, (mightyplayer2.besttimes.isEmpty() ? I18n.translate("shortcut.notime") : mightyplayer2.besttimes.get(0).getString()));
-                    }
+                    mightyplayer2.raceboardname = raceboardFormatter(number, mightyplayer2);
                     MightyScoreBoard.raceboardSetPlayer(mightyplayer2.raceboardname,scoreboard,score2);
                 }else{
                     MightyScoreBoard.raceboardSetPlayer(mightyplayer2.raceboardname,scoreboard,score2-1);
@@ -856,7 +840,12 @@ public class MightyRacingCommand {
         }
         return cuttedname;
     }
-    public static String raceboardFormatter(int number, String namecolor, String cuttedname, String value){
-        return (number < 10 ? " " : "") + number + CGRAY + " | " + namecolor + cuttedname + "      " + CWHITE + CBOLD + value;
+    private static String raceboardFormatter(int number, MightyPlayer mightyplayer){
+        String output = (number < 10 ? " " : "") + number + CGRAY + " | " + mightyplayer.namecolor + mightyplayer.cuttedname + "      " + CWHITE + CBOLD;
+        if (racingstatus == RACING) {
+            return output + (mightyplayer.lap < 10 ? "0" : "") + (mightyplayer.lap == -1 ? 0 : mightyplayer.lap) + "l " + (mightyplayer.sector < 10 ? "0" : "") + mightyplayer.sector + "s";
+        }else{
+            return (mightyplayer.besttimes.isEmpty() ? I18n.translate("shortcut.notime") : mightyplayer.besttimes.get(0).getString());
+        }
     }
 }
