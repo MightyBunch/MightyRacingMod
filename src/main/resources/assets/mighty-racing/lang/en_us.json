@@ -16,6 +16,7 @@
   "info.name.change": "Your raceboard name has changed to %s.",
   "info.ended": "%s is over!",
   "info.pitstops.completed": "Drivers who failed to make required pit stops: %s.",
+  "info.durability.zero": "%s's vehicle durability has reached zero.",
   "error.name.short": "Your raceboard name has to contain at least 3 symbols.",
   "error.name.condition": "You can't change your raceboard name when you are a %s and racestatus is not %s.",
   "error.status.during": "You can't change status during %s."
