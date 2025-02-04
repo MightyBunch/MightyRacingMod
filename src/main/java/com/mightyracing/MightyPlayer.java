@@ -1,6 +1,7 @@
 package com.mightyracing;
 
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.math.Vec3d;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -21,6 +22,8 @@ public class MightyPlayer {
    public String cuttedname;
    public String namecolor;
    public int stops;
+   public double durability;
+   public Vec3d oldPos;
 
    public MightyPlayer(ServerPlayerEntity player) {
       this.player = player;
@@ -34,6 +37,8 @@ public class MightyPlayer {
       this.cuttedname = null;
       this.namecolor = "§f";
       this.stops = 0;
+      this.durability = 0;
+      this.oldPos = null;
       MightyPlayer.list.put(player.getGameProfile().getName(),this);
    }
    public static void allToZero(){
@@ -46,6 +51,8 @@ public class MightyPlayer {
          mightyplayer.interval = "§c+0:00:00";
          mightyplayer.namecolor = "§f";
          mightyplayer.stops = 0;
+         mightyplayer.durability = 0;
+         mightyplayer.oldPos = null;
       }
    }
 }
