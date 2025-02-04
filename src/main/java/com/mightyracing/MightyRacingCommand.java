@@ -5,7 +5,6 @@ import com.mightyracing.util.IEntityDataSaver;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
-import net.minecraft.client.resource.language.I18n;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.scoreboard.Scoreboard;
@@ -21,6 +20,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 import static com.mightyracing.config.MightyConfig.*;
+import static com.mightyracing.MightyText.*;
 
 public class MightyRacingCommand {
     //RACE STATUS
@@ -258,10 +258,10 @@ public class MightyRacingCommand {
                     if (start != null) {
                         if (fast) {
                             trackBestSet(track, name, mightyplayer.currenttimes);
-                            player.sendMessageToClient(Text.translatable("info.time.personal",Text.literal(CGREEN + CBOLD + mightydelta.getString())),false);
+                            player.sendMessageToClient(Text.literal(String.format(info_time_personal,CGREEN + CBOLD + mightydelta.getString())),false);
                             raceboardPutSort(scoreboard, name, CWHITE);
                         } else {
-                            player.sendMessageToClient(Text.translatable("info.time.bad",Text.literal(CRED + CBOLD + mightydelta.getString())),false);
+                            player.sendMessageToClient(Text.literal(String.format(info_time_bad,CRED + CBOLD + mightydelta.getString())),false);
                         }
                     }
                     mightyplayer.starttime = now;
@@ -272,10 +272,10 @@ public class MightyRacingCommand {
                             if (start != null) {
                                 if (fast) {
                                     bestSet(name,mightyplayer.currenttimes);
-                                    player.sendMessageToClient(Text.translatable("info.time.personal",Text.literal(CGREEN + CBOLD + mightydelta.getString())),false);
+                                    player.sendMessageToClient(Text.literal(String.format(info_time_personal,CGREEN + CBOLD + mightydelta.getString())),false);
                                     raceboardPutSort(scoreboard, name, CWHITE);
                                 } else {
-                                    player.sendMessageToClient(Text.translatable("info.time.bad",Text.literal(CRED + CBOLD + mightydelta.getString())),false);
+                                    player.sendMessageToClient(Text.literal(String.format(info_time_bad,CRED + CBOLD + mightydelta.getString())),false);
                                 }
                             }
                             mightyplayer.starttime = now;
@@ -284,10 +284,10 @@ public class MightyRacingCommand {
                             if (start != null) {
                                 if (fast) {
                                     bestSet(name,mightyplayer.currenttimes);
-                                    player.sendMessageToClient(Text.translatable("info.time.personal",Text.literal(CGREEN + CBOLD + mightydelta.getString())),false);
+                                    player.sendMessageToClient(Text.literal(String.format(info_time_personal,CGREEN + CBOLD + mightydelta.getString())),false);
                                     raceboardPutSort(scoreboard, name, CLGRAY);
                                 } else {
-                                    player.sendMessageToClient(Text.translatable("info.time.bad",Text.literal(CRED + CBOLD + mightydelta.getString())),false);
+                                    player.sendMessageToClient(Text.literal(String.format(info_time_bad,CRED + CBOLD + mightydelta.getString())),false);
                                     raceboardPutOnlyNamecolor(scoreboard, name, CLGRAY);
                                 }
                                 mightyplayer.starttime = null;
@@ -307,24 +307,24 @@ public class MightyRacingCommand {
                                         if (MightyTime.compare(mightydelta, fastest.besttimes.get(0))) {
                                             raceboardPutOnlyNamecolor(scoreboard, fastest.player.getGameProfile().getName(), CWHITE);
                                             fastest = mightyplayer;
-                                            broadcastToDrivers(source.getServer(),Text.translatable("info.time.fastest",Text.literal(mightyplayer.cuttedname + " " + CPURPLE + CBOLD + mightydelta.getString())));
+                                            broadcastToDrivers(source.getServer(),Text.literal(String.format(info_time_fastest,mightyplayer.cuttedname + " " + CPURPLE + CBOLD + mightydelta.getString())));
                                         } else {
-                                            player.sendMessageToClient(Text.translatable("info.time.personal",Text.literal(CGREEN + CBOLD + mightydelta.getString())),false);
+                                            player.sendMessageToClient(Text.literal(String.format(info_time_personal,CGREEN + CBOLD + mightydelta.getString())),false);
                                         }
                                     }else{
-                                        broadcastToDrivers(source.getServer(),Text.translatable("info.time.fastest",Text.literal(mightyplayer.cuttedname + " " + CPURPLE + CBOLD + mightydelta.getString())));
+                                        broadcastToDrivers(source.getServer(),Text.literal(String.format(info_time_fastest,mightyplayer.cuttedname + " " + CPURPLE + CBOLD + mightydelta.getString())));
                                         fastest = mightyplayer;
                                     }
                                 } else {
-                                    player.sendMessageToClient(Text.translatable("info.time.bad",Text.literal(CRED + CBOLD + mightydelta.getString())),false);
+                                    player.sendMessageToClient(Text.literal(String.format(info_time_bad,CRED + CBOLD + mightydelta.getString())),false);
                                 }
                                 raceboardPutSort(scoreboard, name, (fastest == mightyplayer) ? CPURPLE : CWHITE);
                                 if (mightyplayer.lap >= racelaps){
                                     if (MightyConfig.getBoolean(AUTO_FINISH)) {
                                         racestage = RENDING;
                                     }
-                                    raceboardDisplay(scoreboard,I18n.translate("shortcut.racing") + CGRAY + "  " + racelaps + "/" + racelaps);
-                                    player.sendMessageToClient(Text.translatable("info.race.finish"),false);
+                                    raceboardDisplay(scoreboard,shortcut_racing + CGRAY + "  " + racelaps + "/" + racelaps);
+                                    player.sendMessageToClient(Text.literal(info_race_finish),false);
                                     raceboardPutOnlyNamecolor(scoreboard, name, (fastest == mightyplayer) ? CDPURPLE : CLGRAY);
                                     mightyplayer.starttime = null;
                                     checkRaceEnd(source.getServer());
@@ -332,9 +332,9 @@ public class MightyRacingCommand {
                                     if (mightyplayer.lap + 1 > racecurlap) {
                                         racecurlap = mightyplayer.lap + 1;
                                         if (racecurlap == racelaps) {
-                                            raceboardDisplay(scoreboard, I18n.translate("shortcut.racing") + CRED + "  " + racecurlap + "/" + racelaps);
+                                            raceboardDisplay(scoreboard, shortcut_racing + CRED + "  " + racecurlap + "/" + racelaps);
                                         }else{
-                                            raceboardDisplay(scoreboard, I18n.translate("shortcut.racing") + CWHITE + "  " + racecurlap + "/" + racelaps);
+                                            raceboardDisplay(scoreboard, shortcut_racing + CWHITE + "  " + racecurlap + "/" + racelaps);
                                         }
                                     }
                                     mightyplayer.starttime = now;
@@ -354,19 +354,19 @@ public class MightyRacingCommand {
                                         if (MightyTime.compare(mightydelta, fastest.besttimes.get(0))) {
                                             raceboardPutOnlyNamecolor(scoreboard, fastest.player.getGameProfile().getName(), (fastest.namecolor.equals(CDPURPLE)) ? CLGRAY : CWHITE);
                                             fastest = mightyplayer;
-                                            broadcastToDrivers(source.getServer(),Text.translatable("info.time.fastest",Text.literal(mightyplayer.cuttedname + " " + CPURPLE + CBOLD + mightydelta.getString())));
+                                            broadcastToDrivers(source.getServer(),Text.literal(String.format(info_time_fastest,mightyplayer.cuttedname + " " + CPURPLE + CBOLD + mightydelta.getString())));
                                         } else {
-                                            player.sendMessageToClient(Text.translatable("info.time.personal",Text.literal(CGREEN + CBOLD + mightydelta.getString())),false);
+                                            player.sendMessageToClient(Text.literal(String.format(info_time_personal,CGREEN + CBOLD + mightydelta.getString())),false);
                                         }
                                     }else{
-                                        broadcastToDrivers(source.getServer(),Text.translatable("info.time.fastest",Text.literal(mightyplayer.cuttedname + " " + CPURPLE + CBOLD + mightydelta.getString())));
+                                        broadcastToDrivers(source.getServer(),Text.literal(String.format(info_time_fastest,mightyplayer.cuttedname + " " + CPURPLE + CBOLD + mightydelta.getString())));
                                         fastest = mightyplayer;
                                     }
                                 } else {
-                                    player.sendMessageToClient(Text.translatable("info.time.bad",Text.literal(CRED + CBOLD + mightydelta.getString())),false);
+                                    player.sendMessageToClient(Text.literal(String.format(info_time_bad,CRED + CBOLD + mightydelta.getString())),false);
                                 }
                                 raceboardPutSort(scoreboard, name, (fastest == mightyplayer) ? CDPURPLE : CLGRAY);
-                                player.sendMessageToClient(Text.translatable("info.race.finish"),false);
+                                player.sendMessageToClient(Text.literal(info_race_finish),false);
                                 mightyplayer.starttime = null;
                                 checkRaceEnd(source.getServer());
                             }
@@ -494,10 +494,10 @@ public class MightyRacingCommand {
                 continue;
             }
             if (racingstatus==QUALI && qualistage!=QSTARTING){
-                player.sendMessageToClient(Text.translatable("error.status.during",Text.translatable("shortcut.quali")),false);
+                player.sendMessageToClient(Text.literal(String.format(error_status_during,shortcut_quali)),false);
                 continue;
             }else if (racingstatus==RACING && racestage!=RSTARTING){
-                player.sendMessageToClient(Text.translatable("error.status.during",Text.translatable("shortcut.racing")),false);
+                player.sendMessageToClient(Text.literal(String.format(error_status_during,shortcut_racing)),false);
                 continue;
             }
             MightyPlayer mightyplayer = new MightyPlayer(player);
@@ -520,7 +520,7 @@ public class MightyRacingCommand {
                 raceboardPutSort(scoreboard, name, CWHITE);
             }
             MightyRacingMod.LOGGER.info("Player " + name + " was added to the racing system!");
-            player.sendMessageToClient(Text.translatable("info.status.switch",Text.translatable("shortcut.driver")),false);
+            player.sendMessageToClient(Text.literal(String.format(info_status_switch,shortcut_driver)),false);
             calls+=1;
         }
         return calls;
@@ -536,7 +536,7 @@ public class MightyRacingCommand {
             raceboardRemoveSort(scoreboard, name);
             MightyPlayer.list.remove(name);
             MightyRacingMod.LOGGER.info("Player " + name + " was removed from the racing system!");
-            player.sendMessageToClient(Text.translatable("info.status.switch",Text.translatable("shortcut.normal")),false);
+            player.sendMessageToClient(Text.literal(String.format(info_status_switch,shortcut_normal)),false);
             calls+=1;
         }
         return calls;
@@ -552,7 +552,7 @@ public class MightyRacingCommand {
         switch (status) {
             case OFFLINE -> {
                 raceboardNotDisplay(scoreboard);
-                broadcastToDrivers(source.getServer(),Text.translatable("info.racestatus.switch",Text.translatable("shortcut.offline")));
+                broadcastToDrivers(source.getServer(),Text.literal(String.format(info_racestatus_switch,shortcut_offline)));
             }
             case PRACTICE -> {
                 track = trackname;
@@ -561,8 +561,8 @@ public class MightyRacingCommand {
                     String name = listentry.getKey();
                     raceboardPutSort(scoreboard, name, CWHITE);
                 }
-                raceboardDisplay(scoreboard,I18n.translate("shortcut.practice"));
-                broadcastToDrivers(source.getServer(),Text.translatable("info.racestatus.switch",Text.translatable("shortcut.practice")));
+                raceboardDisplay(scoreboard,shortcut_practice);
+                broadcastToDrivers(source.getServer(),Text.literal(String.format(info_racestatus_switch,shortcut_practice)));
             }
             case QUALI -> {
                 qualistage = QSTARTING;
@@ -573,8 +573,8 @@ public class MightyRacingCommand {
                     String name = listentry.getKey();
                     raceboardPutSort(scoreboard, name, CWHITE);
                 }
-                raceboardDisplay(scoreboard, I18n.translate("shortcut.quali") + " " + mightydelta.getString());
-                broadcastToDrivers(source.getServer(),Text.translatable("info.racestatus.switch",Text.translatable("shortcut.quali")));
+                raceboardDisplay(scoreboard, shortcut_quali + " " + mightydelta.getString());
+                broadcastToDrivers(source.getServer(),Text.literal(String.format(info_racestatus_switch,shortcut_quali)));
             }
             case RACING -> {
                 racestage = RSTARTING;
@@ -592,8 +592,8 @@ public class MightyRacingCommand {
                         mightyplayer.durability = maxdurability;
                     }
                 }
-                raceboardDisplay(scoreboard,I18n.translate("shortcut.racing") + CWHITE + "  1/" + laps);
-                broadcastToDrivers(source.getServer(),Text.translatable("info.racestatus.switch",Text.translatable("shortcut.racing")));
+                raceboardDisplay(scoreboard,shortcut_racing + CWHITE + "  1/" + laps);
+                broadcastToDrivers(source.getServer(),Text.literal(String.format(info_racestatus_switch,shortcut_racing)));
             }
         }
         return 1;
@@ -628,7 +628,7 @@ public class MightyRacingCommand {
                 raceboardRemoveSort(scoreboard, name);
                 raceboardPutSort(scoreboard, name, CWHITE);
             }
-            player.sendMessageToClient(Text.translatable("info.time.reset",Text.literal(trackname)),false);
+            player.sendMessageToClient(Text.literal(String.format(info_time_reset,trackname)),false);
             calls+=1;
         }
         return calls;
@@ -639,11 +639,11 @@ public class MightyRacingCommand {
         }
         String name = Objects.requireNonNull(source.getPlayer()).getGameProfile().getName();
         if (MightyPlayer.list.containsKey(name) && racingstatus != OFFLINE){
-            Objects.requireNonNull(source.getPlayer()).sendMessageToClient(Text.translatable("error.name.condition",Text.translatable("shortcut.driver"),Text.translatable("shortcut.offline")),false);
+            Objects.requireNonNull(source.getPlayer()).sendMessageToClient(Text.literal(String.format(error_name_condition,shortcut_driver,shortcut_offline)),false);
             return 0;
         }
         if (cuttedname.length() < 3){
-            Objects.requireNonNull(source.getPlayer()).sendMessageToClient(Text.translatable("error.name.short"),false);
+            Objects.requireNonNull(source.getPlayer()).sendMessageToClient(Text.literal(error_name_short),false);
             return 0;
         }
         cuttedname = cutName(cuttedname);
@@ -652,7 +652,7 @@ public class MightyRacingCommand {
             mightyplayer.cuttedname=cuttedname;
         }
         MightyData.putName(((IEntityDataSaver)source.getPlayer()),cuttedname);
-        Objects.requireNonNull(source.getPlayer()).sendMessageToClient(Text.translatable("info.name.change",Text.literal(cuttedname)),false);
+        Objects.requireNonNull(source.getPlayer()).sendMessageToClient(Text.literal(String.format(info_name_change,cuttedname)),false);
         return 1;
     }
     private static int changelaps(ServerCommandSource source, int laps){
@@ -661,7 +661,7 @@ public class MightyRacingCommand {
         }
         racelaps = laps;
         Scoreboard scoreboard = source.getServer().getScoreboard();
-        raceboardDisplay(scoreboard,I18n.translate("shortcut.racing") + CWHITE + "  1/" + laps);
+        raceboardDisplay(scoreboard,shortcut_racing + CWHITE + "  1/" + laps);
         return 1;
     }
     private static int changestops(ServerCommandSource source, int stops){
@@ -688,7 +688,7 @@ public class MightyRacingCommand {
         qualitime = minutes;
         MightyQualiTime mightydelta = new MightyQualiTime(minutes);
         Scoreboard scoreboard = source.getServer().getScoreboard();
-        raceboardDisplay(scoreboard,I18n.translate("shortcut.quali") + " " + mightydelta.getString());
+        raceboardDisplay(scoreboard,shortcut_quali + " " + mightydelta.getString());
         return 1;
     }
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -867,7 +867,7 @@ public class MightyRacingCommand {
             }
         }
         qualistage = QENDED;
-        broadcastToDrivers(server,Text.translatable("info.ended",Text.translatable("shortcut.quali")));
+        broadcastToDrivers(server,Text.literal(String.format(info_ended,shortcut_quali)));
     }
     public static void checkRaceEnd(MinecraftServer server){
         if (racestage != RDURING && racestage != RENDING){
@@ -880,7 +880,7 @@ public class MightyRacingCommand {
             }
         }
         racestage = RENDED;
-        broadcastToDrivers(server,Text.translatable("info.ended",Text.translatable("shortcut.racing")));
+        broadcastToDrivers(server,Text.literal(String.format(info_ended,shortcut_racing)));
         StringBuilder stopstring = new StringBuilder();
         for (Map.Entry<String, MightyPlayer> listentry : MightyPlayer.list.entrySet()){
             MightyPlayer mightyplayer = listentry.getValue();
@@ -891,7 +891,7 @@ public class MightyRacingCommand {
         }
         if (!stopstring.isEmpty()) {
             stopstring = new StringBuilder(stopstring.substring(0, stopstring.length() - 2));
-            broadcastToDrivers(server,Text.translatable("info.pitstops.completed",Text.literal(stopstring.toString())));
+            broadcastToDrivers(server,Text.literal(String.format(info_pitstops_completed,stopstring.toString())));
         }
     }
     private static String cutName(String cuttedname){
@@ -906,7 +906,7 @@ public class MightyRacingCommand {
         if (racingstatus == RACING) {
             return output + (mightyplayer.lap < 10 ? "0" : "") + (mightyplayer.lap == -1 ? 0 : mightyplayer.lap) + "l " + (mightyplayer.sector < 10 ? "0" : "") + mightyplayer.sector + "s";
         }else{
-            return (mightyplayer.besttimes.isEmpty() ? I18n.translate("shortcut.notime") : mightyplayer.besttimes.get(0).getString());
+            return (mightyplayer.besttimes.isEmpty() ? shortcut_notime : mightyplayer.besttimes.get(0).getString());
         }
     }
 }
