@@ -20,6 +20,8 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import static com.mightyracing.config.MightyConfig.*;
+
 public class MightyRacingCommand {
     //RACE STATUS
     public static final int OFFLINE = 0;
@@ -57,6 +59,7 @@ public class MightyRacingCommand {
     public static LocalDateTime qualiend = null;
     public static int racestops = 0;
     public static String raceboarddisplayname = "MRM_raceboard";
+    public static int maxdurability = 0;
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess ignoredCommandRegistryAccess, CommandManager.RegistrationEnvironment ignoredRegistrationEnvironment) {
         dispatcher.register(CommandManager.literal("mightyracing")
                 .then(CommandManager.literal("track").requires(source -> source.hasPermissionLevel(2))
@@ -81,6 +84,11 @@ public class MightyRacingCommand {
                                                 .executes(context -> pitexit(context.getSource(), EntityArgumentType.getPlayers(context, "targets"), IntegerArgumentType.getInteger(context, "number")))
                                         )
                                 )
+                                .then(CommandManager.literal("pitstop")
+                                        .then(CommandManager.argument("durability",IntegerArgumentType.integer(0,10000000))
+                                                .executes(context -> pitstop(context.getSource(), EntityArgumentType.getPlayers(context,"targets"), IntegerArgumentType.getInteger(context, "durability")))
+                                        )
+                                )
                         )
                 )
                 .then(CommandManager.literal("system").requires(source -> source.hasPermissionLevel(2))
@@ -96,23 +104,26 @@ public class MightyRacingCommand {
                         )
                         .then(CommandManager.literal("racestatus")
                                 .then(CommandManager.literal("offline")
-                                        .executes(context -> racestatus(context.getSource(), OFFLINE,null, 0, 0,0))
+                                        .executes(context -> racestatus(context.getSource(), OFFLINE,null, 0, 0,0, 0))
                                 )
                                 .then(CommandManager.literal("practice")
                                         .then(CommandManager.argument("track", StringArgumentType.string())
-                                                .executes(context -> racestatus(context.getSource(), PRACTICE, StringArgumentType.getString(context,"track"), 0, 0,0))
+                                                .executes(context -> racestatus(context.getSource(), PRACTICE, StringArgumentType.getString(context,"track"), 0, 0,0, 0))
                                         )
                                 )
                                 .then(CommandManager.literal("quali")
                                         .then(CommandManager.argument("minutes", IntegerArgumentType.integer(1, 60))
-                                                .executes(context -> racestatus(context.getSource(), QUALI,null,IntegerArgumentType.getInteger(context, "minutes"),0,0))
+                                                .executes(context -> racestatus(context.getSource(), QUALI,null,IntegerArgumentType.getInteger(context, "minutes"),0,0, 0))
                                         )
                                 )
                                 .then(CommandManager.literal("racing")
                                         .then(CommandManager.argument("laps", IntegerArgumentType.integer(1, 99))
-                                                .executes(context -> racestatus(context.getSource(), RACING,null,0,IntegerArgumentType.getInteger(context, "laps"),0))
-                                                .then(CommandManager.argument("pitstops", IntegerArgumentType.integer(1, 10))
-                                                        .executes(context -> racestatus(context.getSource(), RACING,null,0,IntegerArgumentType.getInteger(context, "laps"),IntegerArgumentType.getInteger(context, "pitstops")))
+                                                .executes(context -> racestatus(context.getSource(), RACING,null,0,IntegerArgumentType.getInteger(context, "laps"),0,0))
+                                                .then(CommandManager.argument("pitstops", IntegerArgumentType.integer(0, 10))
+                                                        .executes(context -> racestatus(context.getSource(), RACING,null,0,IntegerArgumentType.getInteger(context, "laps"),IntegerArgumentType.getInteger(context, "pitstops"),0))
+                                                        .then(CommandManager.argument("max_durability", IntegerArgumentType.integer(0, 10000000))
+                                                                .executes(context -> racestatus(context.getSource(), RACING,null,0,IntegerArgumentType.getInteger(context, "laps"),IntegerArgumentType.getInteger(context, "pitstops"),IntegerArgumentType.getInteger(context, "max_durability")))
+                                                        )
                                                 )
                                         )
                                 )
@@ -137,6 +148,11 @@ public class MightyRacingCommand {
                                         .then(CommandManager.literal("pitstops")
                                                 .then(CommandManager.argument("pitstops", IntegerArgumentType.integer(0, 10))
                                                         .executes(context -> changestops(context.getSource(),IntegerArgumentType.getInteger(context, "pitstops")))
+                                                )
+                                        )
+                                        .then(CommandManager.literal("durability")
+                                                .then(CommandManager.argument("max_durability", IntegerArgumentType.integer(0, 10000000))
+                                                        .executes(context -> changedur(context.getSource(),IntegerArgumentType.getInteger(context, "max_durability")))
                                                 )
                                         )
                                 )
@@ -172,7 +188,7 @@ public class MightyRacingCommand {
                 continue;
             }
             MightyPlayer mightyplayer = MightyPlayer.list.get(name);
-            if (mightyplayer.sector >= number || mightyplayer.sector + 1 + MightyConfig.getInteger("checkpoint_precision") < number) {
+            if (mightyplayer.sector >= number || mightyplayer.sector + 1 + MightyConfig.getInteger(CHECKPOINT_PRECISION) < number) {
                 continue;
             }
             LocalDateTime start = mightyplayer.starttime;
@@ -213,7 +229,7 @@ public class MightyRacingCommand {
             }
             MightyPlayer mightyplayer = MightyPlayer.list.get(name);
             LocalDateTime start = mightyplayer.starttime;
-            if ((mightyplayer.sector >= number || mightyplayer.sector == 0 || mightyplayer.sector + 1 + MightyConfig.getInteger("checkpoint_precision") < number) && start != null) {
+            if ((mightyplayer.sector >= number || mightyplayer.sector == 0 || mightyplayer.sector + 1 + MightyConfig.getInteger(CHECKPOINT_PRECISION) < number) && start != null) {
                 continue;
             }
             if (now == null) {
@@ -304,7 +320,7 @@ public class MightyRacingCommand {
                                 }
                                 raceboardPutSort(scoreboard, name, (fastest == mightyplayer) ? CPURPLE : CWHITE);
                                 if (mightyplayer.lap >= racelaps){
-                                    if (MightyConfig.getBoolean("auto_finish")) {
+                                    if (MightyConfig.getBoolean(AUTO_FINISH)) {
                                         racestage = RENDING;
                                     }
                                     raceboardDisplay(scoreboard,I18n.translate("shortcut.racing") + CGRAY + "  " + racelaps + "/" + racelaps);
@@ -324,7 +340,9 @@ public class MightyRacingCommand {
                                     mightyplayer.starttime = now;
                                 }
                             }else {
-                                mightyplayer.starttime = now;
+                                if (maxdurability == 0 || mightyplayer.durability > 0) {
+                                    mightyplayer.starttime = now;
+                                }
                             }
                         }
                         case RENDING -> {
@@ -446,6 +464,28 @@ public class MightyRacingCommand {
         }
         return calls;
     }
+    private static int pitstop(ServerCommandSource source, Collection<ServerPlayerEntity> targets, int dur){
+        if (maxdurability == 0 || racingstatus != RACING || (racestage != RDURING && racestage != RENDING)){
+            return 0;
+        }
+        int calls = 0;
+        for (ServerPlayerEntity player : targets) {
+            String name = player.getGameProfile().getName();
+            if (!MightyPlayer.list.containsKey(name)) {
+                continue;
+            }
+            MightyPlayer mightyplayer = MightyPlayer.list.get(name);
+            if (mightyplayer.starttime == null){
+                continue;
+            }
+            mightyplayer.durability += dur;
+            if (mightyplayer.durability >= maxdurability){
+                mightyplayer.durability = maxdurability;
+            }
+            calls+=1;
+        }
+        return calls;
+    }
     private static int driver(ServerCommandSource source, Collection<ServerPlayerEntity> targets){
         int calls = 0;
         for (ServerPlayerEntity player : targets) {
@@ -473,6 +513,9 @@ public class MightyRacingCommand {
                 raceboardPutSort(scoreboard, name, CWHITE);
             }else if (racingstatus == RACING) {
                 raceboardPutSort(scoreboard, name, CWHITE);
+                if (maxdurability != 0){
+                    mightyplayer.durability = maxdurability;
+                }
             }if (racingstatus == QUALI) {
                 raceboardPutSort(scoreboard, name, CWHITE);
             }
@@ -498,8 +541,8 @@ public class MightyRacingCommand {
         }
         return calls;
     }
-    private static int racestatus(ServerCommandSource source, int status, String trackname, int minutes, int laps, int stops){
-        if (racingstatus == status || Objects.equals(trackname, "name")){
+    private static int racestatus(ServerCommandSource source, int status, String trackname, int minutes, int laps, int stops, int dur){
+        if (Objects.equals(trackname, "name")){
             return 0;
         }
         MightyPlayer.allToZero();
@@ -539,10 +582,15 @@ public class MightyRacingCommand {
                 racecurlap = 0;
                 racelaps = laps;
                 racestops = stops;
+                maxdurability = dur;
                 bestReset();
                 for (Map.Entry<String, MightyPlayer> listentry : MightyPlayer.list.entrySet()) {
                     String name = listentry.getKey();
                     raceboardPutSort(scoreboard, name, CWHITE);
+                    if (maxdurability != 0){
+                        MightyPlayer mightyplayer = listentry.getValue();
+                        mightyplayer.durability = maxdurability;
+                    }
                 }
                 raceboardDisplay(scoreboard,I18n.translate("shortcut.racing") + CWHITE + "  1/" + laps);
                 broadcastToDrivers(source.getServer(),Text.translatable("info.racestatus.switch",Text.translatable("shortcut.racing")));
@@ -623,8 +671,18 @@ public class MightyRacingCommand {
         racestops = stops;
         return 1;
     }
+    private static int changedur(ServerCommandSource source, int dur){
+        if (racingstatus != RACING || racestage != RSTARTING){
+            return 0;
+        }
+        maxdurability = dur;
+        for (MightyPlayer mightyplayer : MightyPlayer.list.values()){
+            mightyplayer.durability = maxdurability;
+        }
+        return 1;
+    }
     private static int changeminutes(ServerCommandSource source, int minutes){
-        if (racingstatus != QUALI || racestage != QSTARTING){
+        if (racingstatus != QUALI || qualistage != QSTARTING){
             return 0;
         }
         qualitime = minutes;
@@ -791,7 +849,7 @@ public class MightyRacingCommand {
         MightyData.putTime(((IEntityDataSaver) mightyplayer.player),trackname,toTimes);
     }
     public static void broadcastToDrivers(MinecraftServer server, Text message) {
-        if (MightyConfig.getBoolean("broadcast_only_to_drivers")){
+        if (MightyConfig.getBoolean(BROADCAST_ONLY_TO_DRIVERS)){
             for (MightyPlayer mightyplayer : MightyPlayer.list.values()){
                 mightyplayer.player.sendMessageToClient(message,false);
             }
@@ -812,6 +870,9 @@ public class MightyRacingCommand {
         broadcastToDrivers(server,Text.translatable("info.ended",Text.translatable("shortcut.quali")));
     }
     public static void checkRaceEnd(MinecraftServer server){
+        if (racestage != RDURING && racestage != RENDING){
+            return;
+        }
         for (Map.Entry<String, MightyPlayer> listentry : MightyPlayer.list.entrySet()){
             MightyPlayer mightyplayer = listentry.getValue();
             if (mightyplayer.starttime != null){
@@ -821,11 +882,11 @@ public class MightyRacingCommand {
         racestage = RENDED;
         broadcastToDrivers(server,Text.translatable("info.ended",Text.translatable("shortcut.racing")));
         StringBuilder stopstring = new StringBuilder();
-        int required = MightyConfig.getInteger("mandatory_pit_stops");
         for (Map.Entry<String, MightyPlayer> listentry : MightyPlayer.list.entrySet()){
             MightyPlayer mightyplayer = listentry.getValue();
-            if (mightyplayer.stops < required){
+            if (mightyplayer.stops < racestops){
                 stopstring.append(mightyplayer.cuttedname).append(", ");
+                raceboardPutOnlyNamecolor(server.getScoreboard(),mightyplayer.player.getGameProfile().getName(),CRED);
             }
         }
         if (!stopstring.isEmpty()) {
