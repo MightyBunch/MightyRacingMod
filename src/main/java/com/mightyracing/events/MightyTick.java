@@ -5,12 +5,14 @@ import com.mightyracing.config.MightyConfig;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.block.Block;
 import net.minecraft.client.resource.language.I18n;
+import net.minecraft.entity.Entity;
 import net.minecraft.registry.Registries;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraft.world.event.GameEvent;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -127,7 +129,9 @@ public class MightyTick implements ServerTickEvents.EndTick{
             if (mightyplayer.durability <= 0){
                 mightyplayer.durability = 0;
                 if (MightyConfig.getBoolean(DESTROY_VEHICLE) && mightyplayer.player.hasVehicle()) {
-                    Objects.requireNonNull(mightyplayer.player.getVehicle()).kill();
+                    Entity vehicle = Objects.requireNonNull(mightyplayer.player.getVehicle());
+                    vehicle.remove(Entity.RemovalReason.KILLED);
+                    vehicle.emitGameEvent(GameEvent.ENTITY_DIE);
                 }
                 mightyplayer.starttime = null;
                 MightyRacingCommand.raceboardPutOnlyNamecolor(mightyplayer.player.getScoreboard(),mightyplayer.player.getGameProfile().getName(),MightyRacingCommand.CRED);
