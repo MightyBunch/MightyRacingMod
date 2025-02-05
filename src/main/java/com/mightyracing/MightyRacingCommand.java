@@ -229,7 +229,7 @@ public class MightyRacingCommand {
             }
             MightyPlayer mightyplayer = MightyPlayer.list.get(name);
             LocalDateTime start = mightyplayer.starttime;
-            if ((mightyplayer.sector >= number || mightyplayer.sector == 0 || mightyplayer.sector + 1 + MightyConfig.getInteger(CHECKPOINT_PRECISION) < number) && start != null) {
+            if (((mightyplayer.sector >= number || mightyplayer.sector == 0 || mightyplayer.sector + 1 + MightyConfig.getInteger(CHECKPOINT_PRECISION) < number) && start != null) || mightyplayer.finished) {
                 continue;
             }
             if (now == null) {
@@ -327,6 +327,7 @@ public class MightyRacingCommand {
                                     player.sendMessageToClient(Text.literal(info_race_finish),false);
                                     raceboardPutOnlyNamecolor(scoreboard, name, (fastest == mightyplayer) ? CDPURPLE : CLGRAY);
                                     mightyplayer.starttime = null;
+                                    mightyplayer.finished = true;
                                     checkRaceEnd(source.getServer());
                                 }else{
                                     if (mightyplayer.lap + 1 > racecurlap) {
@@ -368,6 +369,7 @@ public class MightyRacingCommand {
                                 raceboardPutSort(scoreboard, name, (fastest == mightyplayer) ? CDPURPLE : CLGRAY);
                                 player.sendMessageToClient(Text.literal(info_race_finish),false);
                                 mightyplayer.starttime = null;
+                                mightyplayer.finished = true;
                                 checkRaceEnd(source.getServer());
                             }
                         }
@@ -447,6 +449,9 @@ public class MightyRacingCommand {
                 continue;
             }
             MightyPlayer mightyplayer = MightyPlayer.list.get(name);
+            if (mightyplayer.finished){
+                continue;
+            }
             switch (racingstatus) {
                 case PRACTICE, QUALI -> {
                     //
@@ -455,7 +460,7 @@ public class MightyRacingCommand {
                     Collection<ServerPlayerEntity> target1 = new ArrayList<>(){};
                     target1.add(player);
                     lap(source,target1,number);
-                    if (mightyplayer.lap > 0 || mightyplayer.lap < racelaps){
+                    if (mightyplayer.lap > 0 && mightyplayer.lap < racelaps){
                         mightyplayer.stops += 1;
                     }
                 }

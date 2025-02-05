@@ -24,6 +24,7 @@ public class MightyPlayer {
    public int stops;
    public double durability;
    public Vec3d oldPos;
+   public boolean finished;
 
    public MightyPlayer(ServerPlayerEntity player) {
       this.player = player;
@@ -39,6 +40,7 @@ public class MightyPlayer {
       this.stops = 0;
       this.durability = 0;
       this.oldPos = null;
+      this.finished = false;
       MightyPlayer.list.put(player.getGameProfile().getName(),this);
    }
    public static void allToZero(){
@@ -53,6 +55,7 @@ public class MightyPlayer {
          mightyplayer.stops = 0;
          mightyplayer.durability = 0;
          mightyplayer.oldPos = null;
+         mightyplayer.finished = false;
       }
    }
 }
