@@ -911,7 +911,7 @@ public class MightyRacingCommand {
         if (racingstatus == RACING) {
             return output + (mightyplayer.lap < 10 ? "0" : "") + (mightyplayer.lap == -1 ? 0 : mightyplayer.lap) + "l " + (mightyplayer.sector < 10 ? "0" : "") + mightyplayer.sector + "s";
         }else{
-            return (mightyplayer.besttimes.isEmpty() ? shortcut_notime : mightyplayer.besttimes.get(0).getString());
+            return output + (mightyplayer.besttimes.isEmpty() ? shortcut_notime : mightyplayer.besttimes.get(0).getString());
         }
     }
 }
