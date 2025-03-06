@@ -2,9 +2,6 @@ package com.mightyracing;
 
 import java.time.Duration;
 
-import static java.lang.Math.abs;
-import static java.lang.Math.round;
-
 public class MightyQualiTime {
    public int m;
    public int s;
