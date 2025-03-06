@@ -15,7 +15,9 @@ public class MightyDataCopy implements ServerPlayerEvents.CopyFrom{
         NbtCompound newNbt = ((IEntityDataSaver) newPlayer).getPersistentData();
         for (String key : oldNbt.getKeys()){
             if (Objects.equals(key, "name")){
-                newNbt.putString("name",oldNbt.getString("name"));
+                newNbt.putString("name", oldNbt.getString("name"));
+            }else if (Objects.equals(key, "stats")){
+                newNbt.put("stats", oldNbt.get("stats"));
             }else{
                 newNbt.putIntArray(key,oldNbt.getIntArray(key));
             }

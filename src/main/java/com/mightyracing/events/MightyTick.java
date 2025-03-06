@@ -1,7 +1,7 @@
 package com.mightyracing.events;
 
 import com.mightyracing.*;
-import com.mightyracing.config.MightyConfig;
+import com.mightyracing.config.Config;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.block.Block;
 import net.minecraft.client.resource.language.I18n;
@@ -19,7 +19,6 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 import static com.mightyracing.MightyText.*;
-import static com.mightyracing.config.MightyConfig.*;
 import static java.lang.Math.round;
 
 public class MightyTick implements ServerTickEvents.EndTick{
@@ -94,7 +93,7 @@ public class MightyTick implements ServerTickEvents.EndTick{
         if (MightyRacingCommand.maxdurability == 0){
             return;
         }
-        Set<String> blockSet = new HashSet<>(Arrays.asList(MightyConfig.getString(SPECIAL_BLOCKS).replace(" ","").split(",")));
+        Set<String> blockSet = Set.of(Config.SPECIAL_BLOCKS.get());
         for (MightyPlayer mightyplayer : MightyPlayer.list.values()){
             if (mightyplayer.starttime == null){
                 continue;
@@ -123,13 +122,13 @@ public class MightyTick implements ServerTickEvents.EndTick{
             mightyplayer.oldPos = newPos;
             
             if (on_block){
-                mightyplayer.durability -= Math.pow(speed * MightyConfig.getFloat(SPECIAL_MODIF),MightyConfig.getFloat(SPECIAL_POWER));
+                mightyplayer.durability -= Math.pow(speed * Config.SPECIAL_MODIF.get(), Config.SPECIAL_POWER.get());
             }else{
-                mightyplayer.durability -= Math.pow(speed * 100 * MightyConfig.getFloat(DEFAULT_MODIF),MightyConfig.getFloat(DEFAULT_POWER));
+                mightyplayer.durability -= Math.pow(speed * 100 * Config.DEFAULT_MODIF.get(), Config.DEFAULT_POWER.get());
             }
             if (mightyplayer.durability <= 0){
                 mightyplayer.durability = 0;
-                if (MightyConfig.getBoolean(DESTROY_VEHICLE) && mightyplayer.player.hasVehicle()) {
+                if (Config.DESTROY_VEHICLE.get() && mightyplayer.player.hasVehicle()) {
                     Entity vehicle = Objects.requireNonNull(mightyplayer.player.getVehicle());
                     vehicle.remove(Entity.RemovalReason.KILLED);
                     vehicle.emitGameEvent(GameEvent.ENTITY_DIE);
