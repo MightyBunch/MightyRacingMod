@@ -2,9 +2,13 @@ package com.mightyracing;
 
 import com.mightyracing.config.Config;
 import com.mightyracing.util.IEntityDataSaver;
+import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.tree.CommandNode;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.scoreboard.Scoreboard;
@@ -18,6 +22,7 @@ import net.minecraft.text.Text;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Supplier;
 
 import static com.mightyracing.MightyText.*;
 
@@ -59,8 +64,9 @@ public class MightyRacingCommand {
     public static int racestops = 0;
     public static String raceboarddisplayname = "MRM_raceboard";
     public static int maxdurability = 0;
+    public static List<String> trackname_blacklist = List.of("name","stats");
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess ignoredCommandRegistryAccess, CommandManager.RegistrationEnvironment ignoredRegistrationEnvironment) {
-        dispatcher.register(CommandManager.literal("mightyracing")
+        CommandNode<ServerCommandSource> node = dispatcher.register(CommandManager.literal("mightyracing")
                 .then(CommandManager.literal("track").requires(source -> source.hasPermissionLevel(2))
                         .then(CommandManager.argument("targets", EntityArgumentType.players())
                                 .then(CommandManager.literal("sector")
@@ -103,27 +109,21 @@ public class MightyRacingCommand {
                         )
                         .then(CommandManager.literal("racestatus")
                                 .then(CommandManager.literal("offline")
-                                        .executes(context -> racestatus(context.getSource(), OFFLINE,null, 0, 0,0, 0))
+                                        .executes(context -> racestatus(context.getSource(), OFFLINE, context))
                                 )
                                 .then(CommandManager.literal("practice")
                                         .then(CommandManager.argument("track", StringArgumentType.string())
-                                                .executes(context -> racestatus(context.getSource(), PRACTICE, StringArgumentType.getString(context,"track"), 0, 0,0, 0))
+                                                .executes(context -> racestatus(context.getSource(), PRACTICE, context))
                                         )
                                 )
                                 .then(CommandManager.literal("quali")
                                         .then(CommandManager.argument("minutes", IntegerArgumentType.integer(1, 60))
-                                                .executes(context -> racestatus(context.getSource(), QUALI,null,IntegerArgumentType.getInteger(context, "minutes"),0,0, 0))
+                                                .executes(context -> racestatus(context.getSource(), QUALI, context))
                                         )
                                 )
                                 .then(CommandManager.literal("racing")
                                         .then(CommandManager.argument("laps", IntegerArgumentType.integer(1, 99))
-                                                .executes(context -> racestatus(context.getSource(), RACING,null,0,IntegerArgumentType.getInteger(context, "laps"),0,0))
-                                                .then(CommandManager.argument("pitstops", IntegerArgumentType.integer(0, 10))
-                                                        .executes(context -> racestatus(context.getSource(), RACING,null,0,IntegerArgumentType.getInteger(context, "laps"),IntegerArgumentType.getInteger(context, "pitstops"),0))
-                                                        .then(CommandManager.argument("max_durability", IntegerArgumentType.integer(0, 10000000))
-                                                                .executes(context -> racestatus(context.getSource(), RACING,null,0,IntegerArgumentType.getInteger(context, "laps"),IntegerArgumentType.getInteger(context, "pitstops"),IntegerArgumentType.getInteger(context, "max_durability")))
-                                                        )
-                                                )
+                                                .executes(context -> racestatus(context.getSource(), RACING, context))
                                         )
                                 )
                         )
@@ -134,26 +134,12 @@ public class MightyRacingCommand {
                                         )
                                 )
                         )
-                        .then(CommandManager.literal("race")
-                                .then(CommandManager.literal("start")
-                                        .executes(context -> racestart(context.getSource()))
+                        .then(CommandManager.literal("start")
+                                .then(CommandManager.literal("quali")
+                                        .executes(context -> qualistart(context.getSource()))
                                 )
-                                .then(CommandManager.literal("change")
-                                        .then(CommandManager.literal("laps")
-                                                .then(CommandManager.argument("laps", IntegerArgumentType.integer(1, 99))
-                                                        .executes(context -> changelaps(context.getSource(),IntegerArgumentType.getInteger(context, "laps")))
-                                                )
-                                        )
-                                        .then(CommandManager.literal("pitstops")
-                                                .then(CommandManager.argument("pitstops", IntegerArgumentType.integer(0, 10))
-                                                        .executes(context -> changestops(context.getSource(),IntegerArgumentType.getInteger(context, "pitstops")))
-                                                )
-                                        )
-                                        .then(CommandManager.literal("durability")
-                                                .then(CommandManager.argument("max_durability", IntegerArgumentType.integer(0, 10000000))
-                                                        .executes(context -> changedur(context.getSource(),IntegerArgumentType.getInteger(context, "max_durability")))
-                                                )
-                                        )
+                                .then(CommandManager.literal("race")
+                                        .executes(context -> racestart(context.getSource()))
                                 )
                         )
                         .then(CommandManager.literal("quali")
@@ -179,7 +165,39 @@ public class MightyRacingCommand {
                         )
                 )
         );
+        long t = System.nanoTime();
+        addOptional(node.getChild("system").getChild("racestatus").getChild("racing").getChild("laps"), Map.of(
+                "maxdurability", IntegerArgumentType.integer(0, 10000000),
+                "pitstops", IntegerArgumentType.integer(0,10)
+        ), context -> racestatus(context.getSource(), RACING, context));
+        MightyRacingMod.LOGGER.info(String.valueOf(System.nanoTime() - t));
     }
+
+    private static void addOptional(CommandNode<ServerCommandSource> base, Map<String, ArgumentType<?>> args, Command<ServerCommandSource> command){
+        List<Supplier<CommandNode<ServerCommandSource>>> supps = new ArrayList<>();
+        for (Map.Entry<String, ArgumentType<?>> entry : args.entrySet()){
+            String name = entry.getKey();
+            ArgumentType<?> arg = entry.getValue();
+            supps.add(() -> CommandManager.literal(name).then(CommandManager.argument(name,arg).executes(command)).build());
+        }
+        subTree(base, supps);
+    }
+    private static void subTree(CommandNode<ServerCommandSource> base, List<Supplier<CommandNode<ServerCommandSource>>> args){
+        Optional<CommandNode<ServerCommandSource>> base2 = base.getChildren().stream().findAny();
+        if (base2.isPresent()){
+            base = base2.get();
+        }
+        for (Supplier<CommandNode<ServerCommandSource>> entry : args) {
+            CommandNode<ServerCommandSource> entryNode = entry.get();
+            base.addChild(entryNode);
+            List<Supplier<CommandNode<ServerCommandSource>>> remainingArgs = new ArrayList<>(args);
+            remainingArgs.remove(entry);
+            if (!remainingArgs.isEmpty()) {
+                subTree(entryNode, remainingArgs);
+            }
+        }
+    }
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     private static int sector(ServerCommandSource source, Collection<ServerPlayerEntity> targets, int number){
         if (racingstatus == OFFLINE) {
@@ -551,9 +569,14 @@ public class MightyRacingCommand {
         }
         return calls;
     }
-    private static int racestatus(ServerCommandSource source, int status, String trackname, int minutes, int laps, int stops, int dur){
-        if (Objects.equals(trackname, "name")){
-            return 0;
+    private static int racestatus(ServerCommandSource source, int status, CommandContext<ServerCommandSource> context){
+        String trackname = "";
+        try {
+            trackname = StringArgumentType.getString(context, "track");
+            if (trackname_blacklist.contains(trackname)){
+                return 0;
+            }
+        }catch (Exception ignored){
         }
         MightyPlayer.allToZero();
         racingstatus = status;
@@ -565,6 +588,9 @@ public class MightyRacingCommand {
                 broadcastToDrivers(source.getServer(),Text.literal(String.format(info_racestatus_switch,shortcut_offline)));
             }
             case PRACTICE -> {
+                if (trackname_blacklist.contains(trackname)){
+                    return 0;
+                }
                 track = trackname;
                 trackBestLoadAll(trackname);
                 for (Map.Entry<String, MightyPlayer> listentry : MightyPlayer.list.entrySet()){
@@ -576,8 +602,11 @@ public class MightyRacingCommand {
             }
             case QUALI -> {
                 qualistage = QSTARTING;
-                qualitime = minutes;
-                MightyQualiTime mightydelta = new MightyQualiTime(minutes);
+                try {
+                    qualitime = IntegerArgumentType.getInteger(context, "minutes");
+                }catch (Exception ignored){
+                }
+                MightyQualiTime mightydelta = new MightyQualiTime(qualitime);
                 bestReset();
                 for (Map.Entry<String, MightyPlayer> listentry : MightyPlayer.list.entrySet()) {
                     String name = listentry.getKey();
@@ -590,9 +619,20 @@ public class MightyRacingCommand {
                 racestage = RSTARTING;
                 fastest = null;
                 racecurlap = 0;
-                racelaps = laps;
-                racestops = stops;
-                maxdurability = dur;
+                try {
+                    racelaps = IntegerArgumentType.getInteger(context, "laps");
+                }catch (Exception ignored){
+                }
+                try {
+                    maxdurability = IntegerArgumentType.getInteger(context, "maxdurability");
+                }catch (Exception e){
+                    maxdurability = 0;
+                }
+                try {
+                    racestops = IntegerArgumentType.getInteger(context, "pitstops");
+                }catch (Exception e){
+                    racestops = 0;
+                }
                 bestReset();
                 for (Map.Entry<String, MightyPlayer> listentry : MightyPlayer.list.entrySet()) {
                     String name = listentry.getKey();
@@ -602,7 +642,7 @@ public class MightyRacingCommand {
                         mightyplayer.durability = maxdurability;
                     }
                 }
-                raceboardDisplay(scoreboard,shortcut_racing + CWHITE + "  1/" + laps);
+                raceboardDisplay(scoreboard,shortcut_racing + CWHITE + "  1/" + racelaps);
                 broadcastToDrivers(source.getServer(),Text.literal(String.format(info_racestatus_switch,shortcut_racing)));
             }
         }
@@ -626,7 +666,7 @@ public class MightyRacingCommand {
     }
     private static int timereset(ServerCommandSource source, Collection<ServerPlayerEntity> targets ,String trackname) {
         int calls = 0;
-        if (Objects.equals(trackname, "name")){
+        if (trackname_blacklist.contains(trackname)){
             return 0;
         }
         for (ServerPlayerEntity player : targets) {
