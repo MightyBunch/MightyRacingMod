@@ -6,7 +6,7 @@ import java.util.Map;
 public class MightyText {
     public static String shortcut_offline = "§c§lOFFLINE";
     public static String shortcut_practice = "§e§lFREE PRACTICE";
-    public static String shortcut_quali = "§2§lQUALIFICATIONГОВНО";
+    public static String shortcut_quali = "§2§lQUALIFICATION";
     public static String shortcut_racing = "§4§lGRAND PRIX";
     public static String shortcut_driver = "§lDRIVER";
     public static String shortcut_normal = "§lNORMAL";
