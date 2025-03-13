@@ -21,7 +21,7 @@ public class MightyText {
     public static String info_race_finish = "You finished the race!";
     public static String info_name_change = "Your racename has changed to %s§r.";
     public static String info_ended = "%s§r is over!";
-    public static String info_pitstops_completed = "Drivers who failed to make required pit stops: %s§r.";
+    public static String info_pitstops_completed = "%s§r failed to make required number of pit stops.";
     public static String info_durability_zero = "%s§r's vehicle durability has reached zero.";
     public static Map<String, String> info_stats = new HashMap<>();
     public static String info_stats_stats = "%s's statistics:";
