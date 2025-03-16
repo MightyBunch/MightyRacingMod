@@ -18,6 +18,7 @@ public class MightyText {
     public static String info_time_bad = "Your time is: %s§r.";
     public static String info_time_fastest = "New fastest lap: %s§r.";
     public static String info_time_reset = "Your time on track %s§r has been reset.";
+    public static String info_stats_reset = "Your stats has been reset.";
     public static String info_race_finish = "You finished the race!";
     public static String info_name_change = "Your racename has changed to %s§r.";
     public static String info_ended = "%s§r is over!";
@@ -27,7 +28,11 @@ public class MightyText {
     public static String info_stats_stats = "%s's statistics:";
     public static String error_name_short = "Your racename has to contain at least 3 symbols.";
     public static String error_name_condition = "You can't change your racename when you are a %s§r and racestatus is not %s§r.";
-    public static String error_status_during = "You can't change status during %s§r.";
+    public static String error_status_during = "You can't change player's status during %s§r.";
+    public static String error_illegal_trackname = "Illegal trackname.";
+    public static String feedback_time_reset = "%s's time on track %s§r has been reset.";
+    public static String feedback_stats_reset = "%s's stats has been reset.";
+    public static String feedback_status_switch = "%s's status switched to %s§r.";
 
     static {
         info_stats.put("racename", "Racename: %s");
