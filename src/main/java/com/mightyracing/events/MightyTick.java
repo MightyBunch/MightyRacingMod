@@ -135,7 +135,7 @@ public class MightyTick implements ServerTickEvents.EndTick{
                 }
                 mightyplayer.starttime = null;
                 MightyRacingCommand.raceboardPutOnlyNamecolor(mightyplayer.player.getScoreboard(),mightyplayer.player.getGameProfile().getName(),MightyRacingCommand.CRED);
-                MightyRacingCommand.broadcastToDrivers(mightyplayer.player.server,Text.literal(String.format(info_durability_zero,mightyplayer.cuttedname)));
+                MightyRacingCommand.broadcastToDrivers(mightyplayer.player.server,Text.literal(String.format(info_durability_zero,mightyplayer.cuttedname)), null);
                 mightyplayer.finished = true;
                 MightyRacingCommand.checkRaceEnd(mightyplayer.player.server);
             }
