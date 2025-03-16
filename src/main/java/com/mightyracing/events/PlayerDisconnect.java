@@ -2,7 +2,6 @@ package com.mightyracing.events;
 
 import com.mightyracing.MightyPlayer;
 import com.mightyracing.MightyRacingCommand;
-import com.mightyracing.MightyRacingMod;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
@@ -15,7 +14,8 @@ public class PlayerDisconnect implements ServerPlayConnectionEvents.Disconnect{
         if (MightyPlayer.list.containsKey(name)) {
             MightyRacingCommand.raceboardRemoveSort(server.getScoreboard(), name);
             MightyPlayer.list.remove(name);
-            MightyRacingMod.LOGGER.info("Player " + name + " was removed from the racing system!");
+            MightyRacingCommand.checkQualiEnd(server);
+            MightyRacingCommand.checkRaceEnd(server);
         }
     }
 }

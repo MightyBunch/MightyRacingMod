@@ -47,4 +47,8 @@ public class MightyData {
         }
         return result;
     }
+    public static void removeStats(IEntityDataSaver player){
+        NbtCompound nbt = player.getPersistentData();
+        nbt.remove("stats");
+    }
 }
