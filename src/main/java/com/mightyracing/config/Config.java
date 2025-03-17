@@ -18,11 +18,6 @@ public class Config {
             "This setting controls whether broadcast messages (e.g. new fastest lap or racestatus changes) are sent to all players or only drivers.",
             true
     );
-    public static ConfigBase<Boolean> SEND_FEEDBACK = new ConfigBase<>(
-            "send_feedback",
-            "This setting controls whether feedback messages are sent when using commands.",
-            true
-    );
     public static ConfigBase<Boolean> STATS_ENABLE = new ConfigBase<>(
             "stats_enable",
             "This setting allows you to disable driver stats.",

@@ -18,7 +18,6 @@ import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
-import net.minecraft.world.GameRules;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -519,16 +518,16 @@ public class MightyRacingCommand {
     }
     private static int driver(ServerCommandSource source, Collection<ServerPlayerEntity> targets){
         int calls = 0;
+        if (racingstatus==QUALI && qualistage!=QSTARTING){
+            source.sendError(Text.literal(String.format(error_status_during,shortcut_quali)));
+            return 0;
+        }else if (racingstatus==RACING && racestage!=RSTARTING){
+            source.sendError(Text.literal(String.format(error_status_during,shortcut_racing)));
+            return 0;
+        }
         for (ServerPlayerEntity player : targets) {
             String name = player.getGameProfile().getName();
             if (MightyPlayer.list.containsKey(name)) {
-                continue;
-            }
-            if (racingstatus==QUALI && qualistage!=QSTARTING){
-                source.sendError(Text.literal(String.format(error_status_during,shortcut_quali)));
-                continue;
-            }else if (racingstatus==RACING && racestage!=RSTARTING){
-                source.sendError(Text.literal(String.format(error_status_during,shortcut_racing)));
                 continue;
             }
             MightyPlayer mightyplayer = new MightyPlayer(player);
@@ -539,26 +538,35 @@ public class MightyRacingCommand {
             }
             mightyplayer.cuttedname = cuttedname;
             Scoreboard scoreboard = source.getServer().getScoreboard();
-            if (racingstatus == PRACTICE) {
-                trackBestLoad(track, name);
-                raceboardPutSort(scoreboard, name, CWHITE);
-            }else if (racingstatus == RACING) {
-                raceboardPutSort(scoreboard, name, CWHITE);
-                if (maxdurability != 0){
-                    mightyplayer.durability = maxdurability;
+            String text = String.format(info_status_switch,shortcut_driver);
+            switch (racingstatus){
+                case OFFLINE -> {
+                    text += "\n" + String.format(info_racestatus_now,shortcut_offline);
                 }
-            }if (racingstatus == QUALI) {
-                raceboardPutSort(scoreboard, name, CWHITE);
-            }
-            boolean sf = Config.SEND_FEEDBACK.get();
-            if (source.getEntity() == player && source.getWorld().getGameRules().getBoolean(GameRules.SEND_COMMAND_FEEDBACK) && sf) {
-                source.sendFeedback(() -> Text.literal(String.format(info_status_switch,shortcut_driver)), true);
-            }else{
-                if (sf) {
-                    source.sendFeedback(() -> Text.literal(String.format(feedback_status_switch, name, shortcut_driver)), true);
+                case PRACTICE -> {
+                    trackBestLoad(track, name);
+                    raceboardPutSort(scoreboard, name, CWHITE);
+                    text += "\n" + String.format(info_racestatus_now,shortcut_practice) + "\n" + String.format(info_racestatus_track,track);
                 }
-                player.sendMessageToClient(Text.literal(String.format(info_status_switch,shortcut_driver)),false);
+                case QUALI -> {
+                    raceboardPutSort(scoreboard, name, CWHITE);
+                    text += "\n" + String.format(info_racestatus_now,shortcut_quali) + "\n" + String.format(info_racestatus_duration,qualitime);
+                }
+                case RACING -> {
+                    raceboardPutSort(scoreboard, name, CWHITE);
+                    if (maxdurability != 0){
+                        mightyplayer.durability = maxdurability;
+                    }
+                    text += "\n" + String.format(info_racestatus_now,shortcut_racing) +
+                            "\n" + String.format(info_racestatus_laps,racelaps) +
+                            (racestops == 0 ? "" : "\n" + String.format(info_racestatus_pitstops,racestops)) +
+                            (maxdurability == 0 ? "" : "\n" + String.format(info_racestatus_durability,maxdurability));
+                }
             }
+            if (source.getEntity() != player) {
+                source.sendFeedback(() -> Text.literal(String.format(feedback_status_switch, name, shortcut_driver)), false);
+            }
+            player.sendMessageToClient(Text.literal(text),false);
             calls+=1;
         }
         return calls;
@@ -573,15 +581,10 @@ public class MightyRacingCommand {
             Scoreboard scoreboard = source.getServer().getScoreboard();
             raceboardRemoveSort(scoreboard, name);
             MightyPlayer.list.remove(name);
-            boolean sf = Config.SEND_FEEDBACK.get();
-            if (source.getEntity() == player && source.getWorld().getGameRules().getBoolean(GameRules.SEND_COMMAND_FEEDBACK) && sf) {
-                source.sendFeedback(() -> Text.literal(String.format(info_status_switch,shortcut_normal)), true);
-            }else{
-                if (sf) {
-                    source.sendFeedback(() -> Text.literal(String.format(feedback_status_switch, name, shortcut_normal)), true);
-                }
-                player.sendMessageToClient(Text.literal(String.format(info_status_switch,shortcut_normal)),false);
+            if (source.getEntity() != player) {
+                source.sendFeedback(() -> Text.literal(String.format(feedback_status_switch, name, shortcut_normal)), false);
             }
+            player.sendMessageToClient(Text.literal(String.format(info_status_switch,shortcut_normal)),false);
             checkQualiEnd(source.getServer());
             checkRaceEnd(source.getServer());
             calls+=1;
@@ -598,14 +601,12 @@ public class MightyRacingCommand {
         racingstatus = status;
         Scoreboard scoreboard = source.getServer().getScoreboard();
         clearRaceboard(scoreboard);
-        boolean sf = Config.SEND_FEEDBACK.get();
         switch (status) {
             case OFFLINE -> {
                 raceboardNotDisplay(scoreboard);
-                if (sf) {
-                    source.sendFeedback(() -> Text.literal(String.format(info_racestatus_switch, shortcut_offline)), true);
-                }
-                broadcastToDrivers(source.getServer(),Text.literal(String.format(info_racestatus_switch,shortcut_offline)),source.getPlayer());
+                String text = String.format(info_racestatus_switch, shortcut_offline);
+                source.sendFeedback(() -> Text.literal(text), false);
+                broadcastToDrivers(source.getServer(),Text.literal(text),source.getPlayer());
             }
             case PRACTICE -> {
                 if (trackname_blacklist.contains(trackname)){
@@ -619,10 +620,9 @@ public class MightyRacingCommand {
                     raceboardPutSort(scoreboard, name, CWHITE);
                 }
                 raceboardDisplay(scoreboard,shortcut_practice);
-                if (sf) {
-                    source.sendFeedback(() -> Text.literal(String.format(info_racestatus_switch, shortcut_practice)), true);
-                }
-                broadcastToDrivers(source.getServer(),Text.literal(String.format(info_racestatus_switch,shortcut_practice)),source.getPlayer());
+                String text = String.format(info_racestatus_switch, shortcut_practice) + "\n" + String.format(info_racestatus_track, trackname);
+                source.sendFeedback(() -> Text.literal(text), false);
+                broadcastToDrivers(source.getServer(),Text.literal(text),source.getPlayer());
             }
             case QUALI -> {
                 qualistage = QSTARTING;
@@ -637,10 +637,9 @@ public class MightyRacingCommand {
                     raceboardPutSort(scoreboard, name, CWHITE);
                 }
                 raceboardDisplay(scoreboard, shortcut_quali + " " + mightydelta.getString());
-                if (sf) {
-                    source.sendFeedback(() -> Text.literal(String.format(info_racestatus_switch, shortcut_quali)), true);
-                }
-                broadcastToDrivers(source.getServer(),Text.literal(String.format(info_racestatus_switch,shortcut_quali)),source.getPlayer());
+                String text = String.format(info_racestatus_switch, shortcut_quali) + "\n" + String.format(info_racestatus_duration, qualitime);
+                source.sendFeedback(() -> Text.literal(text), false);
+                broadcastToDrivers(source.getServer(),Text.literal(text),source.getPlayer());
             }
             case RACING -> {
                 racestage = RSTARTING;
@@ -670,28 +669,34 @@ public class MightyRacingCommand {
                     }
                 }
                 raceboardDisplay(scoreboard,shortcut_racing + CWHITE + "  1/" + racelaps);
-                if (sf) {
-                    source.sendFeedback(() -> Text.literal(String.format(info_racestatus_switch, shortcut_racing)), true);
-                }
-                broadcastToDrivers(source.getServer(),Text.literal(String.format(info_racestatus_switch,shortcut_racing)),source.getPlayer());
+                String text = String.format(info_racestatus_switch, shortcut_racing) +
+                        "\n" + String.format(info_racestatus_laps,racelaps) +
+                        (racestops == 0 ? "" : "\n" + String.format(info_racestatus_pitstops,racestops)) +
+                        (maxdurability == 0 ? "" : "\n" + String.format(info_racestatus_durability,maxdurability));
+                source.sendFeedback(() -> Text.literal(text), false);
+                broadcastToDrivers(source.getServer(),Text.literal(text),source.getPlayer());
             }
         }
         return 1;
     }
     private static int qualistart(ServerCommandSource source) {
         if (racingstatus != QUALI || qualistage != QSTARTING){
+            source.sendError(Text.literal(String.format(error_start,shortcut_quali)));
             return 0;
         }
         qualistage = QDURING;
         LocalDateTime now = LocalDateTime.now();
         qualiend = now.plusMinutes(qualitime).plusSeconds(1);
+        source.sendFeedback(() -> Text.literal(String.format(feedback_start, shortcut_quali)), false);
         return 1;
     }
     private static int racestart(ServerCommandSource source) {
         if (racingstatus != RACING || racestage != RSTARTING){
+            source.sendError(Text.literal(String.format(error_start,shortcut_racing)));
             return 0;
         }
         racestage = RDURING;
+        source.sendFeedback(() -> Text.literal(String.format(feedback_start, shortcut_racing)), false);
         return 1;
     }
     private static int timereset(ServerCommandSource source, Collection<ServerPlayerEntity> targets ,String trackname) {
@@ -709,15 +714,10 @@ public class MightyRacingCommand {
                 raceboardRemoveSort(scoreboard, name);
                 raceboardPutSort(scoreboard, name, CWHITE);
             }
-            boolean sf = Config.SEND_FEEDBACK.get();
-            if (source.getEntity() == player && source.getWorld().getGameRules().getBoolean(GameRules.SEND_COMMAND_FEEDBACK) && sf) {
-                source.sendFeedback(() -> Text.literal(String.format(info_time_reset,trackname)), true);
-            }else{
-                if (sf) {
-                    source.sendFeedback(() -> Text.literal(String.format(feedback_time_reset, name, trackname)), true);
-                }
-                player.sendMessageToClient(Text.literal(String.format(info_time_reset,trackname)),false);
+            if (source.getEntity() != player) {
+                source.sendFeedback(() -> Text.literal(String.format(feedback_time_reset, name, trackname)), false);
             }
+            player.sendMessageToClient(Text.literal(String.format(info_time_reset,trackname)),false);
             calls+=1;
         }
         return calls;
@@ -726,30 +726,26 @@ public class MightyRacingCommand {
         int calls = 0;
         for (ServerPlayerEntity player : targets) {
             MightyData.removeStats((IEntityDataSaver) player);
-            boolean sf = Config.SEND_FEEDBACK.get();
-            if (source.getEntity() == player && source.getWorld().getGameRules().getBoolean(GameRules.SEND_COMMAND_FEEDBACK) && sf) {
-                source.sendFeedback(() -> Text.literal(info_stats_reset), true);
-            }else{
-                if (sf){
-                    source.sendFeedback(() -> Text.literal(String.format(feedback_stats_reset, player.getGameProfile().getName())), true);
-                }
-                player.sendMessageToClient(Text.literal(info_stats_reset),false);
+            if (source.getEntity() != player) {
+                source.sendFeedback(() -> Text.literal(String.format(feedback_stats_reset, player.getGameProfile().getName())), false);
             }
+            player.sendMessageToClient(Text.literal(info_stats_reset),false);
             calls+=1;
         }
         return calls;
     }
     private static int setName(ServerCommandSource source, String cuttedname) {
         if (!source.isExecutedByPlayer()){
+            source.sendError(Text.literal(error_notplayer));
             return 0;
         }
         String name = Objects.requireNonNull(source.getPlayer()).getGameProfile().getName();
         if (MightyPlayer.list.containsKey(name) && racingstatus != OFFLINE){
-            Objects.requireNonNull(source.getPlayer()).sendMessageToClient(Text.literal(String.format(error_name_condition,shortcut_driver,shortcut_offline)),false);
+            source.sendError(Text.literal(String.format(error_name_condition,shortcut_driver,shortcut_offline)));
             return 0;
         }
         if (cuttedname.length() < 3){
-            Objects.requireNonNull(source.getPlayer()).sendMessageToClient(Text.literal(error_name_short),false);
+            source.sendError(Text.literal(error_name_short));
             return 0;
         }
         cuttedname = cutName(cuttedname);
@@ -762,7 +758,8 @@ public class MightyRacingCommand {
         return 1;
     }
     private static int showStats(ServerCommandSource source, ServerPlayerEntity statsPlayer) {
-        if (source.getPlayer() == null || statsPlayer == null){
+        if (source.getPlayer() == null){
+            source.sendError(Text.literal(error_notplayer));
             return 0;
         }
         String name = statsPlayer.getGameProfile().getName();
