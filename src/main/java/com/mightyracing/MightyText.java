@@ -13,6 +13,12 @@ public class MightyText {
     public static String shortcut_notime = "No time";
     public static String shortcut_field = "§8============================";
     public static String info_racestatus_switch = "Race status switched to %s§r.";
+    public static String info_racestatus_now = "Current race status is %s§r.";
+    public static String info_racestatus_track = "Track: %s§r.";
+    public static String info_racestatus_duration = "Duration: %s§r minutes.";
+    public static String info_racestatus_laps = "Laps: %s§r.";
+    public static String info_racestatus_pitstops = "Required pit stops: %s§r.";
+    public static String info_racestatus_durability = "Max durability: %s§r.";
     public static String info_status_switch = "Your status switched to %s§r.";
     public static String info_time_personal = "Your new best time is: %s§r.";
     public static String info_time_bad = "Your time is: %s§r.";
@@ -30,9 +36,12 @@ public class MightyText {
     public static String error_name_condition = "You can't change your racename when you are a %s§r and racestatus is not %s§r.";
     public static String error_status_during = "You can't change player's status during %s§r.";
     public static String error_illegal_trackname = "Illegal trackname.";
+    public static String error_start = "%s§r cannot be started because it is either already started or not ready to begin.";
+    public static String error_notplayer = "This command can only be executed by a player.";
     public static String feedback_time_reset = "%s's time on track %s§r has been reset.";
     public static String feedback_stats_reset = "%s's stats has been reset.";
     public static String feedback_status_switch = "%s's status switched to %s§r.";
+    public static String feedback_start = "%s§r started.";
 
     static {
         info_stats.put("racename", "Racename: %s");
