@@ -47,5 +47,5 @@ This project is licensed under the Apache License - see the [LICENSE](LICENSE) f
 
 ## Misc.
 
-[MODRINTH](https://modrinth.com/mod/mighty_racing_mod)
+[MODRINTH](https://modrinth.com/mod/mightyracingmod)
 [CURSEFORGE](https://www.curseforge.com/minecraft/mc-mods/mightyracingmod)
