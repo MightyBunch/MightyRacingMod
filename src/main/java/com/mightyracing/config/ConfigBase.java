@@ -9,14 +9,14 @@ import java.util.*;
 
 public class ConfigBase<V> {
     private V value;
-    private String key;
-    private String comment;
+    private final String key;
+    private final String comment;
     private int min;
     private int max;
     private String[] accepted;
     private float fmin;
     private float fmax;
-    private static List<ConfigBase<?>> configList = new ArrayList<>();
+    private final static List<ConfigBase<?>> configList = new ArrayList<>();
     //boolean
     public ConfigBase(String key, String comment, V value){
         this.key = key;

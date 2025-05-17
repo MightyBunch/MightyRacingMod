@@ -4,7 +4,6 @@ import com.mightyracing.*;
 import com.mightyracing.config.Config;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.block.Block;
-import net.minecraft.client.resource.language.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.registry.Registries;
 import net.minecraft.server.MinecraftServer;
@@ -33,6 +32,7 @@ public class MightyTick implements ServerTickEvents.EndTick{
     public static final int QENDED = 3;
     @Override
     public void onEndTick(MinecraftServer server) {
+        MightySelection.checkExpire();
         switch (MightyRacingCommand.racingstatus) {
             case PRACTICE -> {
                 sendActionTime();
