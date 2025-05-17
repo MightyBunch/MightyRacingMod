@@ -3,10 +3,8 @@ package com.mightyracing.events;
 import com.mightyracing.*;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.scoreboard.Scoreboard;
-import net.minecraft.scoreboard.ScoreboardCriterion;
 import net.minecraft.scoreboard.ScoreboardObjective;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.text.Text;
 
 public class WorldLoad implements ServerLifecycleEvents.ServerStarted{
     public static final int OFFLINE = 0;

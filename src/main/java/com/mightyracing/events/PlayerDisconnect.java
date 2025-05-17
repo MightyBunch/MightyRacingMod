@@ -2,6 +2,7 @@ package com.mightyracing.events;
 
 import com.mightyracing.MightyPlayer;
 import com.mightyracing.MightyRacingCommand;
+import com.mightyracing.MightySelection;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
@@ -17,5 +18,6 @@ public class PlayerDisconnect implements ServerPlayConnectionEvents.Disconnect{
             MightyRacingCommand.checkQualiEnd(server);
             MightyRacingCommand.checkRaceEnd(server);
         }
+        MightySelection.selections.remove(name);
     }
 }

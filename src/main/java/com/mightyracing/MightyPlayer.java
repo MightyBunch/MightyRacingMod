@@ -41,10 +41,10 @@ public class MightyPlayer {
       this.durability = 0;
       this.oldPos = null;
       this.finished = false;
-      MightyPlayer.list.put(player.getGameProfile().getName(),this);
+      list.put(player.getGameProfile().getName(),this);
    }
    public static void allToZero(){
-      for(MightyPlayer mightyplayer : MightyPlayer.list.values()) {
+      for(MightyPlayer mightyplayer : list.values()) {
          mightyplayer.sector = 0;
          mightyplayer.lap = -1;
          mightyplayer.starttime = null;

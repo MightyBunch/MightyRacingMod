@@ -17,7 +17,11 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.ClickEvent;
+import net.minecraft.text.HoverEvent;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -149,6 +153,7 @@ public class MightyRacingCommand {
                         )
                 )
                 .then(CommandManager.literal("name")
+                        .executes(context -> setName(context.getSource(), null))
                         .then(CommandManager.argument("name",StringArgumentType.string())
                                 .executes(context -> setName(context.getSource(), StringArgumentType.getString(context,"name")))
                         )
@@ -159,11 +164,18 @@ public class MightyRacingCommand {
                                 .executes(context -> showStats(context.getSource(),EntityArgumentType.getPlayer(context, "player")))
                         )
                 )
+                .then(CommandManager.literal("select").requires(source -> source.hasPermissionLevel(2))
+                        .executes(context -> select(context.getSource(), " "))
+                        .then(CommandManager.argument(" ", StringArgumentType.word())
+                                .executes(context -> select(context.getSource(), StringArgumentType.getString(context," ")))
+                        )
+                )
         );
         addOptional(node.getChild("system").getChild("racestatus").getChild("racing").getChild("laps"), Map.of(
                 "maxdurability", IntegerArgumentType.integer(0, 10000000),
                 "pitstops", IntegerArgumentType.integer(0,10)
         ), context -> racestatus(context.getSource(), RACING, context));
+        dispatcher.register(CommandManager.literal("mr").redirect(node));
     }
 
     private static void addOptional(CommandNode<ServerCommandSource> base, Map<String, ArgumentType<?>> args, Command<ServerCommandSource> command){
@@ -739,6 +751,15 @@ public class MightyRacingCommand {
             source.sendError(Text.literal(error_notplayer));
             return 0;
         }
+        if (cuttedname == null){
+            cuttedname = MightyData.getName((IEntityDataSaver) source.getPlayer());
+            if (cuttedname.isEmpty()){
+                source.getPlayer().sendMessageToClient(Text.literal(String.format(info_name_no, cuttedname)),false);
+            }else{
+                source.getPlayer().sendMessageToClient(Text.literal(String.format(info_name, cuttedname)),false);
+            }
+            return 1;
+        }
         String name = Objects.requireNonNull(source.getPlayer()).getGameProfile().getName();
         if (MightyPlayer.list.containsKey(name) && racingstatus != OFFLINE){
             source.sendError(Text.literal(String.format(error_name_condition,shortcut_driver,shortcut_offline)));
@@ -751,10 +772,10 @@ public class MightyRacingCommand {
         cuttedname = cutName(cuttedname);
         if (MightyPlayer.list.containsKey(name)){
             MightyPlayer mightyplayer = MightyPlayer.list.get(name);
-            mightyplayer.cuttedname=cuttedname;
+            mightyplayer.cuttedname = cuttedname;
         }
-        MightyData.putName(((IEntityDataSaver)source.getPlayer()),cuttedname);
-        Objects.requireNonNull(source.getPlayer()).sendMessageToClient(Text.literal(String.format(info_name_change,cuttedname)),false);
+        MightyData.putName(((IEntityDataSaver)source.getPlayer()), cuttedname);
+        source.getPlayer().sendMessageToClient(Text.literal(String.format(info_name_change, cuttedname)),false);
         return 1;
     }
     private static int showStats(ServerCommandSource source, ServerPlayerEntity statsPlayer) {
@@ -766,6 +787,56 @@ public class MightyRacingCommand {
         Map<String, Integer> stats = MightyData.getStats((IEntityDataSaver) statsPlayer);
         String racename = MightyData.getName((IEntityDataSaver) statsPlayer);
         source.getPlayer().sendMessageToClient(Text.literal(statsFormatter(name, racename, stats)),false);
+        return 1;
+    }
+    private static int select(ServerCommandSource source, String str) {
+        if (source.getPlayer() == null){
+            source.sendError(Text.literal(error_notplayer));
+            return 0;
+        }
+        ServerPlayerEntity player = source.getPlayer();
+        switch (str){
+            case "position1" -> {
+                MightySelection.setPos(source.getPlayer(), source.getPosition(), 1, source.getWorld());
+                return 1;
+            }
+            case "position2" -> {
+                MightySelection.setPos(source.getPlayer(), source.getPosition(), 2, source.getWorld());
+                return 1;
+            }
+            case "generate" -> {
+                String res = MightySelection.getSelector(player);
+                if (!res.isEmpty()){
+                    Text message = Text.literal(res).setStyle(Style.EMPTY
+                            .withColor(Formatting.GREEN)
+                            .withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, res))
+                            .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal(tooltip_copy)))
+                    );
+                    player.sendMessageToClient(message, false);
+                }else{
+                    source.sendError(Text.literal(error_noposition));
+                }
+                return 1;
+            }
+            case "clear" -> {
+                MightySelection.removeSelector(player);
+                return 1;
+            }
+        }
+        Text message = Text.literal("").setStyle(Style.EMPTY).append(Text.literal(button_pos1).setStyle(Style.EMPTY
+                .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/mightyracing select position1"))
+                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal(tooltip_pos1)))
+        )).append(Text.literal("  ")).setStyle(Style.EMPTY).append(Text.literal(button_pos2).setStyle(Style.EMPTY
+                .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/mightyracing select position2"))
+                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal(tooltip_pos2)))
+        )).append(Text.literal("  ")).setStyle(Style.EMPTY).append(Text.literal(button_generate).setStyle(Style.EMPTY
+                .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/mightyracing select generate"))
+                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal(tooltip_generate)))
+        )).append(Text.literal("  ")).setStyle(Style.EMPTY).append(Text.literal(button_clear).setStyle(Style.EMPTY
+                .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/mightyracing select clear"))
+                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal(tooltip_clear)))
+        ));
+        player.sendMessageToClient(message, false);
         return 1;
     }
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
