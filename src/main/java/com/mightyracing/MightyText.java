@@ -26,7 +26,9 @@ public class MightyText {
     public static String info_time_reset = "Your time on track %s§r has been reset.";
     public static String info_stats_reset = "Your stats has been reset.";
     public static String info_race_finish = "You finished the race!";
-    public static String info_name_change = "Your racename has changed to %s§r.";
+    public static String info_name = "Your racing name: %s§r.";
+    public static String info_name_no = "You don't have a racing name yet.";
+    public static String info_name_change = "Your racing name has changed to %s§r.";
     public static String info_ended = "%s§r is over!";
     public static String info_pitstops_completed = "%s§r failed to make required number of pit stops.";
     public static String info_durability_zero = "%s§r's vehicle durability has reached zero.";
@@ -38,10 +40,20 @@ public class MightyText {
     public static String error_illegal_trackname = "Illegal trackname.";
     public static String error_start = "%s§r cannot be started because it is either already started or not ready to begin.";
     public static String error_notplayer = "This command can only be executed by a player.";
+    public static String error_noposition = "You need to set at least one position before generating a selector.";
     public static String feedback_time_reset = "%s's time on track %s§r has been reset.";
     public static String feedback_stats_reset = "%s's stats has been reset.";
     public static String feedback_status_switch = "%s's status switched to %s§r.";
     public static String feedback_start = "%s§r started.";
+    public static String tooltip_generate = "Click to generate the selector.";
+    public static String tooltip_pos1 = "Click to set the first position.";
+    public static String tooltip_pos2 = "Click to set the second position.";
+    public static String tooltip_copy = "§2Click to copy the selector.";
+    public static String tooltip_clear = "Click to clear the selection.";
+    public static String button_pos1 = "§6[POS1]§r";
+    public static String button_pos2 = "§e[POS2]§r";
+    public static String button_generate = "§d[GENERATE]§r";
+    public static String button_clear = "§c[CLEAR]§r";
 
     static {
         info_stats.put("racename", "Racename: %s");
