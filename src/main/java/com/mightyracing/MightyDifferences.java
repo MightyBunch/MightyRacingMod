@@ -4,7 +4,7 @@ import net.minecraft.scoreboard.*;
 import net.minecraft.scoreboard.number.NumberFormat;
 import net.minecraft.text.Text;
 
-public class MightyScoreBoard {
+public class MightyDifferences {
     private static final ScoreboardDisplaySlot SIDEBAR_SLOT = ScoreboardDisplaySlot.SIDEBAR;
     public static void setRaceboardSidebar(Scoreboard scoreboard){
         ScoreboardObjective raceboard = scoreboard.getNullableObjective("MRM_raceboard");

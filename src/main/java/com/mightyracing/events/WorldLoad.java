@@ -16,7 +16,7 @@ public class WorldLoad implements ServerLifecycleEvents.ServerStarted{
             if (raceboard != null) {
                 scoreboard.removeObjective(raceboard);
             }
-            MightyScoreBoard.addObjectiveRaceboard(scoreboard);
+            MightyDifferences.addObjectiveRaceboard(scoreboard);
         }
     }
 }
