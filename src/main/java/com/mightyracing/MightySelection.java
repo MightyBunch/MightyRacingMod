@@ -104,10 +104,7 @@ public class MightySelection {
         nbt.put("Rotation", floatList(rotationV, rotationH));
         nbt.putInt("background", color);
         nbt.putBoolean("see_through", true);
-        Entity entity = EntityType.loadEntityWithPassengers(nbt, world, lentity -> {
-            lentity.refreshPositionAfterTeleport(xPos, yPos, zPos);
-            return lentity;
-        });
+        Entity entity = MightyDifferences.getEntity(nbt, world, xPos, yPos, zPos);
         EntityTrackerEntry tracker = null;
         if (entity != null) {
             tracker = new EntityTrackerEntry(world, entity, EntityType.TEXT_DISPLAY.getTrackTickInterval(), EntityType.TEXT_DISPLAY.alwaysUpdateVelocity(), packet -> player.networkHandler.sendPacket(packet));
