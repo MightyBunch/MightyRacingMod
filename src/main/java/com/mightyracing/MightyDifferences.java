@@ -6,7 +6,7 @@ import net.minecraft.scoreboard.ScoreboardObjective;
 import net.minecraft.scoreboard.ScoreboardPlayerScore;
 import net.minecraft.text.Text;
 
-public class MightyScoreBoard {
+public class MightyDifferences {
     private static final int SIDEBAR_SLOT = 1;
     public static void setRaceboardSidebar(Scoreboard scoreboard){
         ScoreboardObjective raceboard = scoreboard.getNullableObjective("MRM_raceboard");

@@ -130,7 +130,9 @@ public class MightySelection {
 
     private void removeTrackers(){
         for(EntityTrackerEntry tracker : this.trackers){
-            tracker.stopTracking(this.player);
+            if (tracker != null) {
+                tracker.stopTracking(this.player);
+            }
         }
         this.trackers.clear();
     }
