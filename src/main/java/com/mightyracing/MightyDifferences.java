@@ -1,6 +1,10 @@
 package com.mightyracing;
 
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.scoreboard.*;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 
 public class MightyDifferences {
@@ -27,5 +31,11 @@ public class MightyDifferences {
         ScoreboardObjective raceboard = scoreboard.getNullableObjective("MRM_raceboard");
         ScoreboardPlayerScore raceboardentry = scoreboard.getPlayerScore(raceboardname,raceboard);
         raceboardentry.setScore(score);
+    }
+    public static Entity getEntity(NbtCompound nbt, ServerWorld world, double xPos, double yPos, double zPos){
+        return EntityType.loadEntityWithPassengers(nbt, world, lentity -> {
+            lentity.refreshPositionAfterTeleport(xPos, yPos, zPos);
+            return lentity;
+        });
     }
 }
