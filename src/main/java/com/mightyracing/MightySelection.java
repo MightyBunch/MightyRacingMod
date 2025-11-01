@@ -2,9 +2,6 @@ package com.mightyracing;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtFloat;
-import net.minecraft.nbt.NbtList;
 import net.minecraft.server.network.EntityTrackerEntry;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -83,29 +80,8 @@ public class MightySelection {
         selection.updateExpiration();
     }
 
-    private static NbtList floatList(float... values) {
-        NbtList list = new NbtList();
-        for (float value : values) {
-            list.add(NbtFloat.of(value));
-        }
-        return list;
-    }
-
     private static EntityTrackerEntry generateEntity(double xPos, double yPos, double zPos, ServerWorld world, float scalex, float scaley, float rotationV, float rotationH, ServerPlayerEntity player, int color){
-        NbtCompound nbt = new NbtCompound();
-        nbt.putString("id", "minecraft:text_display");
-        NbtCompound transformation = new NbtCompound();
-        transformation.put("left_rotation", floatList(0f, 0f, 0f, 1f));
-        transformation.put("right_rotation", floatList(0f, 0f, 0f, 1f));
-        transformation.put("scale", floatList(scalex * 40f, scaley * 40f, 1f));
-        transformation.put("translation", floatList(0f, 0f, 0f));
-        nbt.put("transformation", transformation);
-        nbt.putString("alignment", "left");
-        nbt.put("Rotation", floatList(rotationV, rotationH));
-        nbt.putInt("background", color);
-        nbt.putBoolean("see_through", true);
-        nbt.putString("text","\u00A0");
-        Entity entity = MightyDifferences.getEntity(nbt, world, xPos, yPos, zPos);
+        Entity entity = MightyDifferences.getEntity(world, xPos, yPos, zPos, scalex, scaley, rotationV, rotationH, color);
         EntityTrackerEntry tracker = null;
         if (entity != null) {
             tracker = new EntityTrackerEntry(world, entity, EntityType.TEXT_DISPLAY.getTrackTickInterval(), EntityType.TEXT_DISPLAY.alwaysUpdateVelocity(), packet -> player.networkHandler.sendPacket(packet));
