@@ -1,19 +1,10 @@
 # MightyRacingMod
 
-## Overview
+MightyRacingMod allows you to setup your own races in Minecraft! Mod is directed to the **boat racing, but you can actually setup any race you want - elytra race, race on a horse, and even parkour race! And your friends or players on a server don't even need to download the mod - it's fully server side.
 
-MightyRacingMod is a Minecraft mod designed to enhance your boat racing experience. It introduces new commands and uses command blocks to manage race tracks. With MightyRacingMod, you can easily set up and manage boat races, while the scoreboard feature keeps track of all the important race statistics, displaying a comprehensive raceboard for all drivers.
+Mod is featuring advanced **Checkpoint System**, that you can setup on your race track using command blocks; cool **Raceboard**, that uses vanilla scoreboard as a base and keeps track of all the drivers on the track, as well as giving a bit of info of their lap time or track position; dinamic **Durability System** - every driver has it's own durability, that's decreasing depending on the driver's speed and track surface! You can tweak some values in the config; and **Statistics** - some data is collected across all qualifications and races, and you can check your own or any player on the server, how many wins or podiums you or they have.
 
-## Features
-
-- **Raceboard**: Uses the scoreboard to display driver standings, their on-track position and their fastest lap in real-time! (see it the 'Preview')
-- **Lap Time Display**: Displays the current lap time and the intervals from their best lap above the inventory. (see it the 'Preview')
-- **Commands**: Adds a variety of commands to help set up Practice, Qualification and Grand Prix. Mod utilizes command blocks to setup race track - with them you can create sectors, finish line and even the pitlane. All commands for this mod start with /mightyracing.
-- **Fully server-side**: Doesn't requires installation on the client-side, as it doesn't use any custom interfaces or new blocks but utilizes command blocks and scoreboard.
-
-## Usage
-
-- Check [Wiki](https://github.com/MightyBunch/MightyRacingMod/wiki) to learn how to use this mod.
+Check [Wiki](https://github.com/MightyBunch/MightyRacingMod/wiki) to learn more about how to use this mod.
 
 ## Preview
 
@@ -33,13 +24,9 @@ Video preview:
 
 https://youtu.be/u1smHAEm5BM
 
-## Please Note
+## Note:
 
-This mod is currently in the early stages of development. While we've put a lot of effort into making it functional and enjoyable, there may still be bugs or incomplete features.
-
-If you encounter any issues, glitches, or have suggestions for improvement, please don't hesitate to let us know! You can report them in the [Issues](https://github.com/MightyBunch/MightyRacingMod/issues) tab of this repository. Your feedback is invaluable in helping us improve the mod for everyone's enjoyment.
-
-Thank you for your support and understanding!
+If you encounter any issues, glitches, or have suggestions for improvement, please don't hesitate to let me know! You can report them in the [Issues](https://github.com/MightyBunch/MightyRacingMod/issues) tab of this repository. Your feedback is invaluable in helping us improve the mod for everyone's enjoyment.
 
 ## License
 
