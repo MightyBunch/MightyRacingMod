@@ -1,10 +1,10 @@
 # MightyRacingMod
 
-MightyRacingMod allows you to setup your own races in Minecraft! Mod is directed to the **boat racing, but you can actually setup any race you want - elytra race, race on a horse, and even parkour race! And your friends or players on a server don't even need to download the mod - it's fully server side.
+MightyRacingMod allows you to set up your own races in Minecraft! The mod is primarily designed for boat racing, but you can actually create any type of race you want — elytra races, horse races, or even parkour races! Best of all, your friends or other players on the server don’t need to download the mod — it’s fully server-side.
 
-Mod is featuring advanced **Checkpoint System**, that you can setup on your race track using command blocks; cool **Raceboard**, that uses vanilla scoreboard as a base and keeps track of all the drivers on the track, as well as giving a bit of info of their lap time or track position; dinamic **Durability System** - every driver has it's own durability, that's decreasing depending on the driver's speed and track surface! You can tweak some values in the config; and **Statistics** - some data is collected across all qualifications and races, and you can check your own or any player on the server, how many wins or podiums you or they have.
+The mod features an advanced **Checkpoint System**, which you can set up on your race track using command blocks; a cool **Raceboard**, built on top of the vanilla scoreboard system, that keeps track of all drivers on the track and displays their lap times and positions; a dynamic **Durability System** — each driver has their own durability that decreases depending on their speed and the track surface (you can tweak the values in the config); and **Statistics** — race data is collected across all qualifications and events, allowing you to check how many wins or podiums you (or any player on the server) have earned.
 
-Check [Wiki](https://github.com/MightyBunch/MightyRacingMod/wiki) to learn more about how to use this mod.
+Check out the [Wiki](https://github.com/MightyBunch/MightyRacingMod/wiki) to learn more about how to use this mod.
 
 ## Preview
 
