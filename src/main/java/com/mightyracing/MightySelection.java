@@ -104,6 +104,7 @@ public class MightySelection {
         nbt.put("Rotation", floatList(rotationV, rotationH));
         nbt.putInt("background", color);
         nbt.putBoolean("see_through", true);
+        nbt.putString("text","\u00A0");
         Entity entity = MightyDifferences.getEntity(nbt, world, xPos, yPos, zPos);
         EntityTrackerEntry tracker = null;
         if (entity != null) {
